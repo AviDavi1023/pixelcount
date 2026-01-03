@@ -37,9 +37,12 @@ export default function TimerViewPage() {
   const [customFillMode, setCustomFillMode] = useState<"random" | "linear" | "solid">("random");
   const [showCustomization, setShowCustomization] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
 
   useEffect(() => {
     fetchTimer();
+    checkLikeStatus();
   }, [shareToken]);
 
   const fetchTimer = async () => {
@@ -50,6 +53,7 @@ export default function TimerViewPage() {
       }
       const data = await response.json();
       setTimer(data);
+      setLikeCount(data._count.likes);
       setCustomStartColor(data.startColor);
       setCustomEndColor(data.endColor);
       setCustomFillMode(data.fillMode);
@@ -57,6 +61,32 @@ export default function TimerViewPage() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkLikeStatus = async () => {
+    try {
+      const response = await fetch(`/api/timers/${shareToken}/like`);
+      const data = await response.json();
+      setIsLiked(data.liked);
+    } catch (error) {
+      console.error("Error checking like status:", error);
+    }
+  };
+
+  const toggleLike = async () => {
+    try {
+      const response = await fetch(`/api/timers/${shareToken}/like`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        setIsLiked(data.liked);
+        setLikeCount((prev) => (data.liked ? prev + 1 : prev - 1));
+      }
+    } catch (error) {
+      console.error("Error toggling like:", error);
     }
   };
 
@@ -112,6 +142,33 @@ export default function TimerViewPage() {
 
       {/* Floating Action Buttons */}
       <div className="fixed top-8 right-8 z-30 flex flex-col gap-3">
+        <button
+          onClick={toggleLike}
+          className={`p-4 backdrop-blur-xl rounded-full border transition ${
+            isLiked
+              ? "bg-red-500/80 border-red-400/50 hover:bg-red-600/80"
+              : "bg-black/75 border-white/20 hover:bg-black/90"
+          }`}
+          title={isLiked ? "Unlike" : "Like"}
+        >
+          <div className="flex flex-col items-center gap-1">
+            <svg
+              className="w-6 h-6 text-white"
+              fill={isLiked ? "currentColor" : "none"}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+            <span className="text-xs text-white font-medium">{likeCount}</span>
+          </div>
+        </button>
+
         <button
           onClick={() => setShowCustomization(!showCustomization)}
           className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"

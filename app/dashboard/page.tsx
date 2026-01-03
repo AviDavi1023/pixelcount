@@ -223,6 +223,12 @@ export default function DashboardPage() {
                       >
                         View
                       </Link>
+                      <Link
+                        href={`/edit/${timer.shareToken}`}
+                        className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg transition text-sm"
+                      >
+                        Edit
+                      </Link>
                       <button
                         onClick={() => togglePublic(timer)}
                         className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
