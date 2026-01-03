@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation("AccountToUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[] @relation("AccountToUser")
+  sessions Session[]
+  timers   Timer[]
+  likes    Like[]
+
+  @@index([email])
+}
+
+model Timer {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Timer configuration
+  timerMode     String   @default("countdown") // "countdown" or "timer"
+  duration      Int?     // in milliseconds (for timer mode)
+  startTime     DateTime? // for countdown mode
+  endTime       DateTime
+  
+  // Visual settings
+  fillMode      String   @default("random") // "random", "linear", "solid"
+  startColor    String   @default("#ffffff")
+  endColor      String   @default("#000000")
+  
+  // Sharing settings
+  isPublic      Boolean  @default(false)
+  shareToken    String   @unique @default(cuid())
+  
+  // Metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  viewCount     Int      @default(0)
+  
+  likes         Like[]
+
+  @@index([userId])
+  @@index([isPublic])
+  @@index([createdAt])
+  @@index([shareToken])
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String
+  timerId   String
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timer     Timer    @relation(fields: [timerId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, timerId])
+  @@index([timerId])
+  @@index([userId])
+}
