@@ -39,6 +39,11 @@ export default function PixelTimer({
     return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
   };
 
+  // Initialize canvas on mount only
+  useEffect(() => {
+    initializeCanvas(true);
+  }, []);
+
   const interpolateColor = (start: ReturnType<typeof hexToRGB>, end: ReturnType<typeof hexToRGB>, ratio: number) => {
     return {
       r: Math.round(start.r + (end.r - start.r) * ratio),
@@ -211,7 +216,7 @@ export default function PixelTimer({
   };
 
   useEffect(() => {
-    initializeCanvas(true);
+    initializeCanvas(false);
 
     const handleResize = () => {
       const canvas = canvasRef.current;
