@@ -32,6 +32,7 @@ export default function PixelTimer({
   const pixelOrderRef = useRef<Uint32Array | undefined>(undefined);
   const imageDataRef = useRef<ImageData | undefined>(undefined);
   const filledPixelsRef = useRef(0);
+  const seedRef = useRef<string>("");
 
   const hexToRGB = (hex: string) => {
     const num = parseInt(hex.slice(1), 16);
@@ -56,7 +57,7 @@ export default function PixelTimer({
     return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
   };
 
-  const initializeCanvas = () => {
+  const initializeCanvas = (resetPixelOrder: boolean = false) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -84,20 +85,25 @@ export default function PixelTimer({
     ctx.putImageData(imageData, 0, 0);
     imageDataRef.current = imageData;
 
-    // Generate pixel order
-    const pixelOrder = new Uint32Array(totalPixels);
-    for (let i = 0; i < totalPixels; i++) {
-      pixelOrder[i] = i;
-    }
-
-    if (fillMode === "random") {
-      for (let i = totalPixels - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
+    // Generate pixel order only if we don't have one yet or if explicitly resetting
+    const currentSeed = `${startColor}-${endColor}-${fillMode}`;
+    if (resetPixelOrder || seedRef.current !== currentSeed || !pixelOrderRef.current) {
+      const pixelOrder = new Uint32Array(totalPixels);
+      for (let i = 0; i < totalPixels; i++) {
+        pixelOrder[i] = i;
       }
+
+      if (fillMode === "random") {
+        for (let i = totalPixels - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
+        }
+      }
+
+      pixelOrderRef.current = pixelOrder;
+      seedRef.current = currentSeed;
     }
 
-    pixelOrderRef.current = pixelOrder;
     filledPixelsRef.current = 0;
   };
 
@@ -205,7 +211,7 @@ export default function PixelTimer({
   };
 
   useEffect(() => {
-    initializeCanvas();
+    initializeCanvas(true);
 
     const handleResize = () => {
       const canvas = canvasRef.current;
@@ -222,7 +228,7 @@ export default function PixelTimer({
         currentProgress = (now - start) / (end - start);
       }
 
-      initializeCanvas();
+      initializeCanvas(false);
       if (canvas) {
         const totalPixels = canvas.width * canvas.height;
         filledPixelsRef.current = Math.floor(currentProgress * totalPixels);

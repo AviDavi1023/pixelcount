@@ -202,8 +202,19 @@ export default function TimerViewPage() {
 
       {/* Customization Panel */}
       {showCustomization && (
-        <div className="fixed top-24 right-8 z-30 w-80 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
-          <h3 className="text-white font-bold mb-4">Customize View</h3>
+        <div className="fixed top-24 right-8 z-40 w-80 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-white font-bold">Customize View</h3>
+            <button
+              onClick={() => setShowCustomization(false)}
+              className="p-1 hover:bg-white/10 rounded-lg transition"
+              title="Close"
+            >
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
           <p className="text-slate-400 text-sm mb-4">Changes only affect your view</p>
 
           <div className="space-y-4">
@@ -262,8 +273,19 @@ export default function TimerViewPage() {
 
       {/* Share Menu */}
       {showShareMenu && (
-        <div className="fixed top-24 right-8 z-30 w-80 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
-          <h3 className="text-white font-bold mb-4">Share Timer</h3>
+        <div className="fixed top-24 right-8 z-40 w-80 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-white font-bold">Share Timer</h3>
+            <button
+              onClick={() => setShowShareMenu(false)}
+              className="p-1 hover:bg-white/10 rounded-lg transition"
+              title="Close"
+            >
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
 
           <div className="space-y-3">
             <button
