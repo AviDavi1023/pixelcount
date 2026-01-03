@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/app/lib/prisma";
 
 export async function GET(
@@ -7,6 +9,8 @@ export async function GET(
 ) {
   try {
     const { shareToken } = await params;
+    const session = await getServerSession(authOptions);
+
     const timer = await prisma.timer.findUnique({
       where: { shareToken },
       include: {
@@ -28,11 +32,26 @@ export async function GET(
       return NextResponse.json({ error: "Timer not found" }, { status: 404 });
     }
 
-    // Increment view count
-    await prisma.timer.update({
-      where: { id: timer.id },
-      data: { viewCount: { increment: 1 } },
-    });
+    // Only increment view count if viewer is not the creator
+    if (session?.user?.email) {
+      const user = await prisma.user.findUnique({
+        where: { email: session.user.email },
+        select: { id: true },
+      });
+
+      if (!user || user.id !== timer.userId) {
+        await prisma.timer.update({
+          where: { id: timer.id },
+          data: { viewCount: { increment: 1 } },
+        });
+      }
+    } else {
+      // If not logged in, always increment views
+      await prisma.timer.update({
+        where: { id: timer.id },
+        data: { viewCount: { increment: 1 } },
+      });
+    }
 
     return NextResponse.json(timer);
   } catch (error) {

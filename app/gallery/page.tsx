@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import PixelTimerThumbnail from "@/app/components/PixelTimerThumbnail";
 
 interface Timer {
   id: string;
@@ -155,15 +156,16 @@ export default function GalleryPage() {
                   </div>
                 </div>
 
-                {/* Color Preview */}
-                <div className="h-12 rounded-lg mb-4 flex overflow-hidden">
-                  <div
-                    className="flex-1"
-                    style={{ backgroundColor: timer.startColor }}
-                  />
-                  <div
-                    className="flex-1"
-                    style={{ backgroundColor: timer.endColor }}
+                {/* Timer Thumbnail */}
+                <div className="rounded-lg mb-4 overflow-hidden bg-slate-800/50 border border-slate-700 h-40">
+                  <PixelTimerThumbnail
+                    startTime={new Date(timer.createdAt)}
+                    endTime={new Date(timer.endTime)}
+                    startColor={timer.startColor}
+                    endColor={timer.endColor}
+                    fillMode={timer.fillMode as "random" | "linear" | "solid"}
+                    width={300}
+                    height={160}
                   />
                 </div>
 
