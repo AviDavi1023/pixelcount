@@ -9,6 +9,7 @@ interface Timer {
   id: string;
   title: string;
   description: string | null;
+  startTime: string | null;
   endTime: string;
   fillMode: string;
   startColor: string;
@@ -159,7 +160,7 @@ export default function GalleryPage() {
                 {/* Timer Thumbnail */}
                 <div className="rounded-lg mb-4 overflow-hidden bg-slate-800/50 border border-slate-700 h-40">
                   <PixelTimerThumbnail
-                    startTime={new Date(timer.createdAt)}
+                    startTime={timer.startTime ? new Date(timer.startTime) : new Date(timer.endTime)}
                     endTime={new Date(timer.endTime)}
                     startColor={timer.startColor}
                     endColor={timer.endColor}
