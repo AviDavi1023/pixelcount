@@ -43,9 +43,17 @@ export default function GalleryPage() {
 
       const response = await fetch(`/api/timers?${params}`);
       const data = await response.json();
-      setTimers(data);
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setTimers(data);
+      } else {
+        console.error("API returned non-array data:", data);
+        setTimers([]);
+      }
     } catch (error) {
       console.error("Error fetching timers:", error);
+      setTimers([]);
     } finally {
       setLoading(false);
     }

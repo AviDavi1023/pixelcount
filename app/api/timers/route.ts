@@ -53,7 +53,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(timers);
   } catch (error: any) {
     console.error("Error fetching timers:", error);
-    return NextResponse.json({ error: "Failed to fetch timers" }, { status: 500 });
+    // Return empty array on error to prevent frontend crashes
+    return NextResponse.json([], { status: 200 });
   }
 }
 
