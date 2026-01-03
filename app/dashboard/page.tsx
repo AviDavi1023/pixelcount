@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import PixelTimerThumbnail from "@/app/components/PixelTimerThumbnail";
 
 interface Timer {
   id: string;
@@ -29,6 +30,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [timers, setTimers] = useState<Timer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTimers, setSelectedTimers] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -135,6 +138,42 @@ export default function DashboardPage() {
     return end > now ? "Active" : "Completed";
   };
 
+  const toggleTimerSelection = (timerId: string) => {
+    const newSelected = new Set(selectedTimers);
+    if (newSelected.has(timerId)) {
+      newSelected.delete(timerId);
+    } else {
+      newSelected.add(timerId);
+    }
+    setSelectedTimers(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedTimers.size === timers.length) {
+      setSelectedTimers(new Set());
+    } else {
+      setSelectedTimers(new Set(timers.map((t) => t.id)));
+    }
+  };
+
+  const deleteSelectedTimers = async () => {
+    if (!confirm(`Delete ${selectedTimers.size} timer(s)? This cannot be undone.`)) return;
+
+    try {
+      for (const timerId of selectedTimers) {
+        const timer = timers.find((t) => t.id === timerId);
+        if (timer) {
+          await fetch(`/api/timers/${timer.shareToken}`, { method: "DELETE" });
+        }
+      }
+      setTimers(timers.filter((t) => !selectedTimers.has(t.id)));
+      setSelectedTimers(new Set());
+    } catch (error) {
+      console.error("Error deleting timers:", error);
+      alert("Failed to delete some timers");
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center">
@@ -199,7 +238,33 @@ export default function DashboardPage() {
         {/* Timers List */}
         <div className="bg-slate-800/30 border border-slate-700 rounded-xl overflow-hidden">
           <div className="p-6 border-b border-slate-700">
-            <h2 className="text-2xl font-bold text-white">Your Timers</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Your Timers</h2>
+              {timers.length > 0 && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={`px-3 py-2 rounded-lg transition text-sm ${
+                      viewMode === "list"
+                        ? "bg-purple-600 text-white"
+                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    }`}
+                  >
+                    List View
+                  </button>
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={`px-3 py-2 rounded-lg transition text-sm ${
+                      viewMode === "grid"
+                        ? "bg-purple-600 text-white"
+                        : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    }`}
+                  >
+                    Grid View
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           {timers.length === 0 ? (
@@ -214,84 +279,219 @@ export default function DashboardPage() {
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-slate-700">
-              {timers.map((timer) => (
-                <div key={timer.id} className="p-6 hover:bg-slate-800/20 transition">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-xl font-bold text-white">{timer.title}</h3>
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            getTimeStatus(timer.endTime) === "Active"
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-slate-500/20 text-slate-400"
-                          }`}
-                        >
-                          {getTimeStatus(timer.endTime)}
-                        </span>
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            timer.isPublic
-                              ? "bg-purple-500/20 text-purple-400"
-                              : "bg-slate-500/20 text-slate-400"
-                          }`}
-                        >
-                          {timer.isPublic ? "Public" : "Private"}
-                        </span>
-                      </div>
-
-                      {timer.description && (
-                        <p className="text-slate-400 text-sm mb-3">{timer.description}</p>
-                      )}
-
-                      <div className="flex items-center gap-4 text-sm text-slate-500">
-                        <span className="capitalize">{timer.fillMode}</span>
-                        <span>👁 {timer.viewCount} views</span>
-                        <span>❤️ {timer._count.likes} likes</span>
-                        <span className="text-xs">
-                          Created {new Date(timer.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 flex-wrap">
-                      <Link
-                        href={`/timer/${timer.shareToken}`}
-                        className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
-                      >
-                        View
-                      </Link>
-                      <Link
-                        href={`/edit/${timer.shareToken}`}
-                        className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg transition text-sm"
-                      >
-                        Edit
-                      </Link>
-                      <button
-                        onClick={() => duplicateTimer(timer)}
-                        className="px-4 py-2 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition text-sm"
-                        title="Duplicate timer"
-                      >
-                        Copy
-                      </button>
-                      <button
-                        onClick={() => togglePublic(timer)}
-                        className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
-                      >
-                        {timer.isPublic ? "Make Private" : "Make Public"}
-                      </button>
-                      <button
-                        onClick={() => deleteTimer(timer.shareToken)}
-                        className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition text-sm"
-                      >
-                        Delete
-                      </button>
-                    </div>
+            <>
+              {/* Multi-select controls */}
+              {timers.length > 0 && (
+                <div className="p-6 border-b border-slate-700 bg-slate-800/50 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedTimers.size === timers.length && timers.length > 0}
+                      onChange={toggleSelectAll}
+                      className="w-5 h-5 rounded cursor-pointer"
+                    />
+                    <span className="text-sm text-slate-400">
+                      {selectedTimers.size > 0 ? `${selectedTimers.size} selected` : "Select all"}
+                    </span>
                   </div>
+                  {selectedTimers.size > 0 && (
+                    <button
+                      onClick={deleteSelectedTimers}
+                      className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition text-sm"
+                    >
+                      Delete Selected ({selectedTimers.size})
+                    </button>
+                  )}
                 </div>
-              ))}
-            </div>
+              )}
+
+              {/* List View */}
+              {viewMode === "list" && (
+                <div className="divide-y divide-slate-700">
+                  {timers.map((timer) => (
+                    <div key={timer.id} className="p-6 hover:bg-slate-800/20 transition">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-4 flex-1">
+                          <input
+                            type="checkbox"
+                            checked={selectedTimers.has(timer.id)}
+                            onChange={() => toggleTimerSelection(timer.id)}
+                            className="w-5 h-5 rounded cursor-pointer mt-1"
+                          />
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="text-xl font-bold text-white">{timer.title}</h3>
+                              <span
+                                className={`px-2 py-1 text-xs rounded-full ${
+                                  getTimeStatus(timer.endTime) === "Active"
+                                    ? "bg-green-500/20 text-green-400"
+                                    : "bg-slate-500/20 text-slate-400"
+                                }`}
+                              >
+                                {getTimeStatus(timer.endTime)}
+                              </span>
+                              <span
+                                className={`px-2 py-1 text-xs rounded-full ${
+                                  timer.isPublic
+                                    ? "bg-purple-500/20 text-purple-400"
+                                    : "bg-slate-500/20 text-slate-400"
+                                }`}
+                              >
+                                {timer.isPublic ? "Public" : "Private"}
+                              </span>
+                            </div>
+
+                            {timer.description && (
+                              <p className="text-slate-400 text-sm mb-3">{timer.description}</p>
+                            )}
+
+                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                              <span className="capitalize">{timer.fillMode}</span>
+                              <span>👁 {timer.viewCount} views</span>
+                              <span>❤️ {timer._count.likes} likes</span>
+                              <span className="text-xs">
+                                Created {new Date(timer.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 flex-wrap">
+                          <Link
+                            href={`/timer/${timer.shareToken}`}
+                            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
+                          >
+                            View
+                          </Link>
+                          <Link
+                            href={`/edit/${timer.shareToken}`}
+                            className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg transition text-sm"
+                          >
+                            Edit
+                          </Link>
+                          <button
+                            onClick={() => duplicateTimer(timer)}
+                            className="px-4 py-2 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition text-sm"
+                            title="Duplicate timer"
+                          >
+                            Copy
+                          </button>
+                          <button
+                            onClick={() => togglePublic(timer)}
+                            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
+                          >
+                            {timer.isPublic ? "Make Private" : "Make Public"}
+                          </button>
+                          <button
+                            onClick={() => deleteTimer(timer.shareToken)}
+                            className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Grid View */}
+              {viewMode === "grid" && (
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                  {timers.map((timer) => (
+                    <div
+                      key={timer.id}
+                      className={`bg-slate-800/50 border rounded-xl overflow-hidden transition cursor-pointer ${
+                        selectedTimers.has(timer.id)
+                          ? "border-purple-500 ring-2 ring-purple-500/50"
+                          : "border-slate-700 hover:border-slate-600"
+                      }`}
+                      onClick={() => toggleTimerSelection(timer.id)}
+                    >
+                      {/* Checkbox */}
+                      <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-slate-800/80">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedTimers.has(timer.id)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              toggleTimerSelection(timer.id);
+                            }}
+                            className="w-5 h-5 rounded cursor-pointer"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <h3 className="font-bold text-white truncate">{timer.title}</h3>
+                        </div>
+                      </div>
+
+                      {/* Thumbnail */}
+                      <div className="h-40 bg-slate-700/50 relative overflow-hidden">
+                        <PixelTimerThumbnail
+                          startTime={new Date(timer.createdAt)}
+                          endTime={new Date(timer.endTime)}
+                          startColor={timer.startColor}
+                          endColor={timer.endColor}
+                          fillMode={timer.fillMode as "random" | "linear" | "solid"}
+                          width={300}
+                          height={160}
+                        />
+                      </div>
+
+                      {/* Info */}
+                      <div className="p-4 space-y-3">
+                        <div className="flex gap-2 flex-wrap">
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              getTimeStatus(timer.endTime) === "Active"
+                                ? "bg-green-500/20 text-green-400"
+                                : "bg-slate-500/20 text-slate-400"
+                            }`}
+                          >
+                            {getTimeStatus(timer.endTime)}
+                          </span>
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              timer.isPublic
+                                ? "bg-purple-500/20 text-purple-400"
+                                : "bg-slate-500/20 text-slate-400"
+                            }`}
+                          >
+                            {timer.isPublic ? "Public" : "Private"}
+                          </span>
+                        </div>
+
+                        {timer.description && (
+                          <p className="text-slate-400 text-sm line-clamp-2">{timer.description}</p>
+                        )}
+
+                        <div className="text-xs text-slate-500">
+                          <div>👁 {timer.viewCount} • ❤️ {timer._count.likes}</div>
+                          <div className="capitalize">{timer.fillMode}</div>
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                          <Link
+                            href={`/timer/${timer.shareToken}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs transition text-center"
+                          >
+                            View
+                          </Link>
+                          <Link
+                            href={`/edit/${timer.shareToken}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex-1 px-3 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded text-xs transition text-center"
+                          >
+                            Edit
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>
