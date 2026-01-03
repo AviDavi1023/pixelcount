@@ -9,19 +9,11 @@ let prismaInstance: PrismaClient;
 if (globalForPrisma.prisma) {
   prismaInstance = globalForPrisma.prisma;
 } else {
-  const connectionString = process.env.DATABASE_URL;
-  
-  // Parse connection string to add sslmode if not present
-  const url = new URL(connectionString!);
-  if (!url.searchParams.has('sslmode')) {
-    url.searchParams.set('sslmode', 'require');
-  }
-  
   const pool = new pg.Pool({
-    connectionString: url.toString(),
-    ssl: process.env.NODE_ENV === 'production' 
-      ? { rejectUnauthorized: false }
-      : false,
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false,
+    },
   });
 
   const adapter = new PrismaPg(pool);
