@@ -148,16 +148,24 @@ export default function LoginPage() {
           </form>
 
           {/* Toggle Sign Up / Sign In */}
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
             <button
               onClick={() => {
                 setIsSignUp(!isSignUp);
                 setError("");
               }}
-              className="text-slate-400 hover:text-white transition text-sm"
+              className="text-slate-400 hover:text-white transition text-sm block w-full"
             >
               {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
             </button>
+            {!isSignUp && (
+              <Link
+                href="/forgot-password"
+                className="text-slate-400 hover:text-white transition text-sm block"
+              >
+                Forgot password?
+              </Link>
+            )}
           </div>
 
           {/* Guest Option */}

@@ -9,6 +9,7 @@ interface Timer {
   id: string;
   title: string;
   description: string | null;
+  timerMode: string;
   endTime: string;
   fillMode: string;
   startColor: string;
@@ -17,6 +18,7 @@ interface Timer {
   isPublic: boolean;
   viewCount: number;
   createdAt: string;
+  duration: number | null;
   _count: {
     likes: number;
   };
@@ -87,6 +89,43 @@ export default function DashboardPage() {
     } catch (error) {
       console.error("Error updating timer:", error);
       alert("Failed to update timer");
+    }
+  };
+
+  const duplicateTimer = async (timer: Timer) => {
+    if (!confirm("Create a copy of this timer with a new end time?")) return;
+
+    try {
+      // Calculate new end time (use duration if available, otherwise estimate from end time)
+      const originalDuration = timer.duration || (new Date(timer.endTime).getTime() - new Date(timer.createdAt).getTime());
+      const newStartTime = new Date();
+      const newEndTime = new Date(newStartTime.getTime() + originalDuration);
+
+      const response = await fetch("/api/timers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: `${timer.title} (Copy)`,
+          description: timer.description,
+          timerMode: timer.timerMode,
+          duration: originalDuration,
+          startTime: newStartTime.toISOString(),
+          endTime: newEndTime.toISOString(),
+          fillMode: timer.fillMode,
+          startColor: timer.startColor,
+          endColor: timer.endColor,
+          isPublic: false, // Start as private
+        }),
+      });
+
+      if (response.ok) {
+        const newTimer = await response.json();
+        alert("Timer duplicated successfully!");
+        fetchUserTimers(); // Refresh list
+      }
+    } catch (error) {
+      console.error("Error duplicating timer:", error);
+      alert("Failed to duplicate timer");
     }
   };
 
@@ -216,7 +255,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap">
                       <Link
                         href={`/timer/${timer.shareToken}`}
                         className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
@@ -229,6 +268,13 @@ export default function DashboardPage() {
                       >
                         Edit
                       </Link>
+                      <button
+                        onClick={() => duplicateTimer(timer)}
+                        className="px-4 py-2 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition text-sm"
+                        title="Duplicate timer"
+                      >
+                        Copy
+                      </button>
                       <button
                         onClick={() => togglePublic(timer)}
                         className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"

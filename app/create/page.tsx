@@ -114,8 +114,24 @@ export default function CreatePage() {
         )}
 
         {!session && (
-          <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-4 py-3 rounded-xl mb-6">
-            <p className="text-sm">💡 Sign in to save and share your timer publicly</p>
+          <div className="bg-yellow-500/10 border border-yellow-500/30 px-4 py-3 rounded-xl mb-6">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">💡</span>
+              <div className="flex-1">
+                <p className="text-yellow-400 text-sm font-medium mb-2">
+                  Guest Mode - Timer won't be saved
+                </p>
+                <p className="text-yellow-300/80 text-xs mb-3">
+                  Your timer will work, but won't be saved to your account or appear in the gallery.
+                </p>
+                <Link
+                  href="/login"
+                  className="inline-block px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-black rounded-lg text-xs font-medium transition"
+                >
+                  Sign In to Save
+                </Link>
+              </div>
+            </div>
           </div>
         )}
 
