@@ -3,11 +3,12 @@ import { prisma } from "@/app/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { shareToken: string } }
+  { params }: { params: Promise<{ shareToken: string }> }
 ) {
   try {
+    const { shareToken } = await params;
     const timer = await prisma.timer.findUnique({
-      where: { shareToken: params.shareToken },
+      where: { shareToken },
       include: {
         user: {
           select: {
@@ -42,11 +43,12 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { shareToken: string } }
+  { params }: { params: Promise<{ shareToken: string }> }
 ) {
   try {
+    const { shareToken } = await params;
     await prisma.timer.delete({
-      where: { shareToken: params.shareToken },
+      where: { shareToken },
     });
 
     return NextResponse.json({ success: true });
@@ -58,14 +60,15 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { shareToken: string } }
+  { params }: { params: Promise<{ shareToken: string }> }
 ) {
   try {
+    const { shareToken } = await params;
     const body = await request.json();
     const { title, description, isPublic } = body;
 
     const timer = await prisma.timer.update({
-      where: { shareToken: params.shareToken },
+      where: { shareToken },
       data: {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),

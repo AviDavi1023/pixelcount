@@ -1,9 +1,10 @@
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/app/lib/prisma";
+import bcrypt from "bcryptjs";
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
@@ -21,19 +22,17 @@ const handler = NextAuth({
           where: { email: credentials.email },
         });
 
-        // For now, allow any email to create an account
-        if (!user) {
-          const newUser = await prisma.user.create({
-            data: {
-              email: credentials.email,
-              name: credentials.email.split("@")[0],
-            },
-          });
-          return {
-            id: newUser.id,
-            email: newUser.email,
-            name: newUser.name,
-          };
+        if (!user || !user.password) {
+          return null;
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+
+        if (!isPasswordValid) {
+          return null;
         }
 
         return {
@@ -55,6 +54,11 @@ const handler = NextAuth({
       return session;
     },
   },
-});
+  session: {
+    strategy: "jwt",
+  },
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };
