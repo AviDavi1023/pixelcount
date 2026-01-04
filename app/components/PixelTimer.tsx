@@ -134,130 +134,24 @@ export default function PixelTimer({
           pixelOrder[i] = pixels[i].index;
         }
       } else if (fillMode === "sand") {
-        // Sand/gravity physics - particles fall and pile up from bottom
-        const filled = new Set<number>();
-        const pixels: Array<{index: number, order: number}> = [];
-        
-        // Simulate sand falling by dropping particles from random x positions
-        // Each particle falls until it hits the bottom or another particle
+        // Sand physics - fast height-map approach
+        // Build up columns from bottom with natural variation
+        const columnHeights = new Uint32Array(width);
         let particleCount = 0;
-        const dropPositions: number[] = [];
         
-        // Pre-generate random drop positions (x coordinates)
-        for (let i = 0; i < totalPixels; i++) {
-          dropPositions.push(Math.floor(Math.random() * width));
-        }
-        
-        // Helper to check if a pixel position is filled
-        const isFilled = (x: number, y: number): boolean => {
-          if (y >= height) return true; // Bottom is always "filled"
-          if (x < 0 || x >= width) return false;
-          return filled.has(y * width + x);
-        };
-        
-        // Drop particles one by one
-        for (let i = 0; i < totalPixels; i++) {
-          let x = dropPositions[i];
-          let y = 0; // Start at top
+        // Fill from bottom up, column by column with randomness
+        while (particleCount < totalPixels) {
+          // Pick a random column to drop sand into
+          const x = Math.floor(Math.random() * width);
           
-          // Fall down until we hit something
-          while (y < height && !isFilled(x, y)) {
-            y++;
-          }
-          
-          // Back up one position (we went one past where we should land)
-          y--;
-          
-          // If we went off the top (pile is full at this x), try to slide left or right
-          if (y < 0) {
-            // Try to find a nearby x position that has space
-            let found = false;
-            for (let offset = 1; offset < width / 2; offset++) {
-              // Try right
-              if (x + offset < width) {
-                let testY = 0;
-                while (testY < height && !isFilled(x + offset, testY)) {
-                  testY++;
-                }
-                testY--;
-                if (testY >= 0) {
-                  x = x + offset;
-                  y = testY;
-                  found = true;
-                  break;
-                }
-              }
-              // Try left
-              if (x - offset >= 0) {
-                let testY = 0;
-                while (testY < height && !isFilled(x - offset, testY)) {
-                  testY++;
-                }
-                testY--;
-                if (testY >= 0) {
-                  x = x - offset;
-                  y = testY;
-                  found = true;
-                  break;
-                }
-              }
-            }
-            
-            // If still no space found, just place at a random position
-            if (!found) {
-              x = Math.floor(Math.random() * width);
-              y = Math.floor(Math.random() * height);
-            }
-          }
-          
-          // Make sure we're in bounds
-          if (y >= 0 && y < height && x >= 0 && x < width) {
+          // If this column isn't full yet, add to it
+          if (columnHeights[x] < height) {
+            const y = height - 1 - columnHeights[x];
             const index = y * width + x;
-            
-            // If this position is already filled, try adjacent positions
-            if (filled.has(index)) {
-              let placed = false;
-              // Try neighbors
-              for (let dy = -1; dy <= 1 && !placed; dy++) {
-                for (let dx = -1; dx <= 1 && !placed; dx++) {
-                  if (dx === 0 && dy === 0) continue;
-                  const ny = y + dy;
-                  const nx = x + dx;
-                  if (ny >= 0 && ny < height && nx >= 0 && nx < width) {
-                    const nIndex = ny * width + nx;
-                    if (!filled.has(nIndex)) {
-                      filled.add(nIndex);
-                      pixels.push({ index: nIndex, order: particleCount++ });
-                      placed = true;
-                    }
-                  }
-                }
-              }
-              // If we still couldn't place it, just place at any unfilled position
-              if (!placed) {
-                for (let fallbackY = height - 1; fallbackY >= 0 && !placed; fallbackY--) {
-                  for (let fallbackX = 0; fallbackX < width && !placed; fallbackX++) {
-                    const fallbackIndex = fallbackY * width + fallbackX;
-                    if (!filled.has(fallbackIndex)) {
-                      filled.add(fallbackIndex);
-                      pixels.push({ index: fallbackIndex, order: particleCount++ });
-                      placed = true;
-                    }
-                  }
-                }
-              }
-            } else {
-              filled.add(index);
-              pixels.push({ index, order: particleCount++ });
-            }
+            pixelOrder[particleCount] = index;
+            columnHeights[x]++;
+            particleCount++;
           }
-        }
-        
-        // Sort by order (order in which particles landed)
-        pixels.sort((a, b) => a.order - b.order);
-        
-        for (let i = 0; i < totalPixels; i++) {
-          pixelOrder[i] = pixels[i].index;
         }
       }
 
