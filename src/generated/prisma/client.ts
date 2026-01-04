@@ -64,3 +64,8 @@ export type Timer = Prisma.TimerModel
  * 
  */
 export type Like = Prisma.LikeModel
+/**
+ * Model PasswordResetToken
+ * 
+ */
+export type PasswordResetToken = Prisma.PasswordResetTokenModel

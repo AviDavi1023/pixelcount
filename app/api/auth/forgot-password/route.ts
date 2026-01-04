@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
+import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,12 +19,30 @@ export async function POST(req: NextRequest) {
     });
 
     // Always return success to prevent email enumeration
-    // In production, you'd send an actual email here
     if (user) {
-      // TODO: Generate reset token, save to database with expiry
+      // Generate secure random token
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date(Date.now() + 3600000); // 1 hour from now
+
+      // Delete any existing reset tokens for this user
+      await prisma.passwordResetToken.deleteMany({
+        where: { userId: user.id },
+      });
+
+      // Create new reset token
+      await prisma.passwordResetToken.create({
+        data: {
+          token: resetToken,
+          userId: user.id,
+          expiresAt,
+        },
+      });
+
       // TODO: Send email with reset link
-      console.log(`Password reset requested for: ${email}`);
-      // Example: Reset link would be: /reset-password?token=SECURE_TOKEN
+      // For now, log it (in production, use SendGrid, Resend, etc.)
+      const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}`;
+      console.log(`Password reset link for ${email}: ${resetUrl}`);
+      console.log(`Token expires at: ${expiresAt.toISOString()}`);
     }
 
     return NextResponse.json(
