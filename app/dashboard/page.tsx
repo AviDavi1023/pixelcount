@@ -138,6 +138,24 @@ export default function DashboardPage() {
     return end > now ? "Active" : "Completed";
   };
 
+  const getTimeRemaining = (endTime: string) => {
+    const now = new Date().getTime();
+    const end = new Date(endTime).getTime();
+    const diff = end - now;
+
+    if (diff <= 0) return "Completed";
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+    if (hours > 0) return `${hours}h ${minutes}m ${seconds}s`;
+    if (minutes > 0) return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
+  };
+
   const toggleTimerSelection = (timerId: string) => {
     const newSelected = new Set(selectedTimers);
     if (newSelected.has(timerId)) {
@@ -309,7 +327,11 @@ export default function DashboardPage() {
               {viewMode === "list" && (
                 <div className="divide-y divide-slate-700">
                   {timers.map((timer) => (
-                    <div key={timer.id} className="p-6 hover:bg-slate-800/20 transition">
+                    <div
+                      key={timer.id}
+                      className="p-6 hover:bg-slate-800/20 transition cursor-pointer"
+                      onClick={() => router.push(`/timer/${timer.shareToken}`)}
+                    >
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-4 flex-1">
                           <input
@@ -317,6 +339,7 @@ export default function DashboardPage() {
                             checked={selectedTimers.has(timer.id)}
                             onChange={() => toggleTimerSelection(timer.id)}
                             className="w-5 h-5 rounded cursor-pointer mt-1"
+                            onClick={(e) => e.stopPropagation()}
                           />
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
@@ -339,6 +362,11 @@ export default function DashboardPage() {
                               >
                                 {timer.isPublic ? "Public" : "Private"}
                               </span>
+                              {getTimeStatus(timer.endTime) === "Active" && (
+                                <span className="px-2 py-1 text-xs rounded-full bg-blue-500/20 text-blue-400">
+                                  {getTimeRemaining(timer.endTime)} remaining
+                                </span>
+                              )}
                             </div>
 
                             {timer.description && (
@@ -358,32 +386,36 @@ export default function DashboardPage() {
 
                         <div className="flex gap-2 flex-wrap">
                           <Link
-                            href={`/timer/${timer.shareToken}`}
-                            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
-                          >
-                            View
-                          </Link>
-                          <Link
                             href={`/edit/${timer.shareToken}`}
+                            onClick={(e) => e.stopPropagation()}
                             className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg transition text-sm"
                           >
                             Edit
                           </Link>
                           <button
-                            onClick={() => duplicateTimer(timer)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              duplicateTimer(timer);
+                            }}
                             className="px-4 py-2 bg-green-600/20 hover:bg-green-600/30 text-green-400 rounded-lg transition text-sm"
                             title="Duplicate timer"
                           >
                             Copy
                           </button>
                           <button
-                            onClick={() => togglePublic(timer)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePublic(timer);
+                            }}
                             className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
                           >
                             {timer.isPublic ? "Make Private" : "Make Public"}
                           </button>
                           <button
-                            onClick={() => deleteTimer(timer.shareToken)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteTimer(timer.shareToken);
+                            }}
                             className="px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition text-sm"
                           >
                             Delete
@@ -406,11 +438,11 @@ export default function DashboardPage() {
                           ? "border-purple-500 ring-2 ring-purple-500/50"
                           : "border-slate-700 hover:border-slate-600"
                       }`}
-                      onClick={() => toggleTimerSelection(timer.id)}
+                      onClick={() => router.push(`/timer/${timer.shareToken}`)}
                     >
                       {/* Checkbox */}
                       <div className="p-4 border-b border-slate-700 flex items-center justify-between bg-slate-800/80">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
                           <input
                             type="checkbox"
                             checked={selectedTimers.has(timer.id)}
@@ -418,7 +450,7 @@ export default function DashboardPage() {
                               e.stopPropagation();
                               toggleTimerSelection(timer.id);
                             }}
-                            className="w-5 h-5 rounded cursor-pointer"
+                            className="w-5 h-5 rounded cursor-pointer flex-shrink-0"
                             onClick={(e) => e.stopPropagation()}
                           />
                           <h3 className="font-bold text-white truncate">{timer.title}</h3>
@@ -461,6 +493,12 @@ export default function DashboardPage() {
                           </span>
                         </div>
 
+                        {getTimeStatus(timer.endTime) === "Active" && (
+                          <div className="px-2 py-1 text-xs rounded bg-blue-500/20 text-blue-400 text-center">
+                            {getTimeRemaining(timer.endTime)} remaining
+                          </div>
+                        )}
+
                         {timer.description && (
                           <p className="text-slate-400 text-sm line-clamp-2">{timer.description}</p>
                         )}
@@ -472,19 +510,21 @@ export default function DashboardPage() {
 
                         <div className="flex gap-2 pt-2">
                           <Link
-                            href={`/timer/${timer.shareToken}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs transition text-center"
-                          >
-                            View
-                          </Link>
-                          <Link
                             href={`/edit/${timer.shareToken}`}
                             onClick={(e) => e.stopPropagation()}
                             className="flex-1 px-3 py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded text-xs transition text-center"
                           >
                             Edit
                           </Link>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePublic(timer);
+                            }}
+                            className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs transition text-center"
+                          >
+                            {timer.isPublic ? "Private" : "Public"}
+                          </button>
                         </div>
                       </div>
                     </div>

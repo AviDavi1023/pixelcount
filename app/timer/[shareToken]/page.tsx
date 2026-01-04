@@ -128,6 +128,17 @@ export default function TimerViewPage() {
   const startTime = timer.startTime ? new Date(timer.startTime) : new Date();
   const endTime = new Date(timer.endTime);
 
+  const formatDateTime = (date: Date) => {
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
   return (
     <>
       <PixelTimer
@@ -139,6 +150,18 @@ export default function TimerViewPage() {
         title={timer.title}
         showControls={true}
       />
+
+      {/* Timer Info */}
+      <div className="fixed top-24 left-1/2 -translate-x-1/2 z-20 px-6 py-3 rounded-xl bg-black/75 backdrop-blur-xl border border-white/20">
+        <div className="text-center text-sm">
+          <div className="text-white/60 mb-1">
+            {timer.startTime && (
+              <span>Started: {formatDateTime(startTime)} • </span>
+            )}
+            Ends: {formatDateTime(endTime)}
+          </div>
+        </div>
+      </div>
 
       {/* Floating Action Buttons */}
       <div className="fixed top-8 right-8 z-30 flex flex-col gap-3">
