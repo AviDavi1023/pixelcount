@@ -2,11 +2,34 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import PixelTimerThumbnail from "@/app/components/PixelTimerThumbnail";
 
 export default function Home() {
   const { data: session } = useSession();
   const [showNav, setShowNav] = useState(false);
+  const [exampleTimers, setExampleTimers] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchExampleTimers();
+  }, []);
+
+  const fetchExampleTimers = async () => {
+    try {
+      const response = await fetch("/api/timers?sortBy=createdAt");
+      const data = await response.json();
+      // Filter for example timers
+      const examples = data.filter((t: any) =>
+        t.shareToken.includes("example") || 
+        t.shareToken.includes("daily-countdown") ||
+        t.shareToken.includes("monthly-countdown") ||
+        t.shareToken.includes("yearly-countdown")
+      ).slice(0, 3);
+      setExampleTimers(examples);
+    } catch (error) {
+      console.error("Error fetching example timers:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900">
@@ -108,6 +131,42 @@ export default function Home() {
             Browse Gallery
           </Link>
         </div>
+
+        {/* Example Timers */}
+        {exampleTimers.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold mb-6 text-white">Example Timers</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {exampleTimers.map((timer) => (
+                <Link
+                  key={timer.id}
+                  href={`/timer/${timer.shareToken}`}
+                  className="block bg-slate-800/30 border border-slate-700 rounded-xl overflow-hidden hover:border-purple-500 hover:bg-slate-800/50 transition group"
+                >
+                  <div className="h-40 bg-slate-700/50 relative overflow-hidden">
+                    <PixelTimerThumbnail
+                      startTime={timer.startTime ? new Date(timer.startTime) : new Date(timer.endTime)}
+                      endTime={new Date(timer.endTime)}
+                      startColor={timer.startColor}
+                      endColor={timer.endColor}
+                      fillMode={timer.fillMode as "random" | "linear" | "solid"}
+                      width={300}
+                      height={160}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-purple-400 transition">
+                      {timer.title}
+                    </h3>
+                    {timer.description && (
+                      <p className="text-slate-400 text-sm">{timer.description}</p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Feature Grid */}
         <div className="grid md:grid-cols-3 gap-8 mt-20">
