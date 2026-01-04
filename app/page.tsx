@@ -27,8 +27,10 @@ export default function Home() {
     try {
       const response = await fetch("/api/timers?sortBy=createdAt");
       const data = await response.json();
+      // Handle both old array format and new pagination format
+      const timersArray = Array.isArray(data) ? data : data.timers || [];
       // Filter for example timers
-      const examples = data.filter((t: any) =>
+      const examples = timersArray.filter((t: any) =>
         t.shareToken.includes("example") || 
         t.shareToken.includes("daily-countdown") ||
         t.shareToken.includes("monthly-countdown") ||
