@@ -34,7 +34,7 @@ export default function TimerViewPage() {
   const [error, setError] = useState("");
   const [customStartColor, setCustomStartColor] = useState("");
   const [customEndColor, setCustomEndColor] = useState("");
-  const [customFillMode, setCustomFillMode] = useState<"random" | "linear" | "solid" | "checkerboard">("random");
+  const [customFillMode, setCustomFillMode] = useState<"random" | "linear" | "solid" | "checkerboard" | "sand">("random");
   const [showCustomization, setShowCustomization] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -371,8 +371,8 @@ export default function TimerViewPage() {
 
             <div>
               <label className="block text-sm font-semibold text-white mb-2">Fill Mode</label>
-              <div className="grid grid-cols-2 gap-2">
-                {(["random", "linear", "solid", "checkerboard"] as const).map((mode) => (
+              <div className="grid grid-cols-3 gap-2">
+                {(["random", "linear", "solid", "checkerboard", "sand"] as const).map((mode) => (
                   <button
                     key={mode}
                     onClick={() => setCustomFillMode(mode)}
