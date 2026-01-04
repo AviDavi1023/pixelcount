@@ -271,6 +271,7 @@ export default function TimerViewPage() {
             </svg>
           </button>
         </div>
+      )}
 
       {/* Customization Panel */}
       {showCustomization && (
