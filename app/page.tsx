@@ -152,6 +152,8 @@ export default function Home() {
                       fillMode={timer.fillMode as "random" | "linear" | "solid"}
                       width={300}
                       height={160}
+                      shareToken={timer.shareToken}
+                      enableCycling={true}
                     />
                   </div>
                   <div className="p-4">

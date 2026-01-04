@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface PixelTimerThumbnailProps {
   startTime: Date;
@@ -10,6 +10,8 @@ interface PixelTimerThumbnailProps {
   fillMode: "random" | "linear" | "solid";
   width?: number;
   height?: number;
+  shareToken?: string;
+  enableCycling?: boolean;
 }
 
 export default function PixelTimerThumbnail({
@@ -20,9 +22,12 @@ export default function PixelTimerThumbnail({
   fillMode,
   width = 300,
   height = 200,
+  shareToken,
+  enableCycling = false,
 }: PixelTimerThumbnailProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pixelOrderRef = useRef<Uint32Array | undefined>(undefined);
+  const [currentFillMode, setCurrentFillMode] = useState<"random" | "linear" | "solid">(fillMode);
 
   const hexToRGB = (hex: string) => {
     const num = parseInt(hex.slice(1), 16);
@@ -36,6 +41,39 @@ export default function PixelTimerThumbnail({
       b: Math.round(start.b + (end.b - start.b) * ratio),
     };
   };
+
+  // Cycle fill mode for example timers on homepage
+  useEffect(() => {
+    if (!enableCycling) return;
+
+    const cycleInterval = setInterval(() => {
+      // Calculate progress percentage
+      const total = endTime.getTime() - startTime.getTime();
+      const elapsed = Date.now() - startTime.getTime();
+      const progressPercent = (elapsed / total) * 100;
+
+      // Determine available modes based on progress
+      const availableModes: ("random" | "linear")[] = [];
+      
+      if (progressPercent >= 5) {
+        // Cycle between random and linear
+        availableModes.push("random", "linear");
+      } else {
+        // Only random available
+        availableModes.push("random");
+      }
+
+      if (availableModes.length > 1) {
+        setCurrentFillMode(prev => {
+          const currentIndex = availableModes.indexOf(prev as "random" | "linear");
+          const nextIndex = (currentIndex + 1) % availableModes.length;
+          return availableModes[nextIndex];
+        });
+      }
+    }, 8000); // Cycle every 8 seconds
+
+    return () => clearInterval(cycleInterval);
+  }, [enableCycling, startTime, endTime]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -64,14 +102,15 @@ export default function PixelTimerThumbnail({
       data[i + 3] = 255;
     }
 
-    // Generate pixel order once
-    if (!pixelOrderRef.current) {
+    // Generate pixel order once or regenerate when fillMode changes
+    const shouldRegenerate = !pixelOrderRef.current || (enableCycling && pixelOrderRef.current);
+    if (shouldRegenerate) {
       const pixelOrder = new Uint32Array(totalPixels);
       for (let i = 0; i < totalPixels; i++) {
         pixelOrder[i] = i;
       }
 
-      if (fillMode === "random") {
+      if (currentFillMode === "random") {
         for (let i = totalPixels - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
@@ -99,7 +138,7 @@ export default function PixelTimerThumbnail({
     const targetPixels = Math.floor(currentProgress * totalPixels);
     const endRGB = hexToRGB(endColor);
 
-    if (fillMode === "solid") {
+    if (currentFillMode === "solid") {
       const currentColor = interpolateColor(startRGB, endRGB, currentProgress);
       ctx.fillStyle = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`;
       ctx.fillRect(0, 0, width, height);
@@ -130,7 +169,7 @@ export default function PixelTimerThumbnail({
 
       const targetPixels = Math.floor(newProgress * totalPixels);
 
-      if (fillMode === "solid") {
+      if (currentFillMode === "solid") {
         const currentColor = interpolateColor(startRGB, endRGB, newProgress);
         ctx.fillStyle = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`;
         ctx.fillRect(0, 0, width, height);
@@ -163,7 +202,7 @@ export default function PixelTimerThumbnail({
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [startTime, endTime, startColor, endColor, fillMode, width, height]);
+  }, [startTime, endTime, startColor, endColor, currentFillMode, width, height]);
 
   return (
     <canvas
