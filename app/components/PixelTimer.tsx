@@ -44,7 +44,22 @@ export default function PixelTimer({
     initializeCanvas(true);
     
     const handleResize = () => {
-      initializeCanvas(true);
+      // Preserve current progress percentage when resizing
+      const oldCanvas = canvasRef.current;
+      if (oldCanvas) {
+        const oldTotalPixels = oldCanvas.width * oldCanvas.height;
+        const currentProgressRatio = oldTotalPixels > 0 ? filledPixelsRef.current / oldTotalPixels : 0;
+        
+        // Reinitialize canvas
+        initializeCanvas(true);
+        
+        // Restore the filled pixels based on progress ratio
+        const newCanvas = canvasRef.current;
+        if (newCanvas) {
+          const newTotalPixels = newCanvas.width * newCanvas.height;
+          filledPixelsRef.current = Math.floor(newTotalPixels * currentProgressRatio);
+        }
+      }
     };
     
     window.addEventListener('resize', handleResize);
