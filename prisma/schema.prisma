@@ -51,8 +51,22 @@ model User {
   sessions Session[]
   timers   Timer[]
   likes    Like[]
+  passwordResetTokens PasswordResetToken[]
 
   @@index([email])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
 }
 
 model Timer {

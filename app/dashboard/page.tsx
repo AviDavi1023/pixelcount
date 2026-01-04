@@ -30,9 +30,12 @@ export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [timers, setTimers] = useState<Timer[]>([]);
+  const [allTimers, setAllTimers] = useState<Timer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTimers, setSelectedTimers] = useState<Set<string>>(new Set());
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -48,9 +51,13 @@ export default function DashboardPage() {
       const userResponse = await fetch("/api/user");
       const userData = await userResponse.json();
 
-      const response = await fetch(`/api/timers?userId=${userData.id}`);
+      const response = await fetch(`/api/timers?userId=${userData.id}&limit=1000`);
       const data = await response.json();
-      setTimers(data);
+      
+      // Handle both old array format and new pagination format
+      const timersList = data.timers || data;
+      setAllTimers(timersList);
+      setTimers(timersList);
     } catch (error) {
       console.error("Error fetching timers:", error);
     } finally {
@@ -61,21 +68,45 @@ export default function DashboardPage() {
   const deleteTimer = async (shareToken: string) => {
     if (!confirm("Are you sure you want to delete this timer?")) return;
 
+    // Optimistic UI update to prevent race conditions
+    const originalTimers = [...timers];
+    const originalAllTimers = [...allTimers];
+    setTimers(timers.filter((t) => t.shareToken !== shareToken));
+    setAllTimers(allTimers.filter((t) => t.shareToken !== shareToken));
+
     try {
       const response = await fetch(`/api/timers/${shareToken}`, {
         method: "DELETE",
       });
 
-      if (response.ok) {
-        setTimers(timers.filter((t) => t.shareToken !== shareToken));
+      if (!response.ok) {
+        // Rollback on failure
+        setTimers(originalTimers);
+        setAllTimers(originalAllTimers);
+        alert("Failed to delete timer");
       }
     } catch (error) {
+      // Rollback on error
+      setTimers(originalTimers);
+      setAllTimers(originalAllTimers);
       console.error("Error deleting timer:", error);
       alert("Failed to delete timer");
     }
   };
 
   const togglePublic = async (timer: Timer) => {
+    // Optimistic UI update
+    const originalTimers = [...timers];
+    const originalAllTimers = [...allTimers];
+    const updatedTimers = timers.map((t) =>
+      t.id === timer.id ? { ...t, isPublic: !t.isPublic } : t
+    );
+    const updatedAllTimers = allTimers.map((t) =>
+      t.id === timer.id ? { ...t, isPublic: !t.isPublic } : t
+    );
+    setTimers(updatedTimers);
+    setAllTimers(updatedAllTimers);
+
     try {
       const response = await fetch(`/api/timers/${timer.shareToken}`, {
         method: "PATCH",
@@ -83,14 +114,16 @@ export default function DashboardPage() {
         body: JSON.stringify({ isPublic: !timer.isPublic }),
       });
 
-      if (response.ok) {
-        setTimers(
-          timers.map((t) =>
-            t.id === timer.id ? { ...t, isPublic: !t.isPublic } : t
-          )
-        );
+      if (!response.ok) {
+        // Rollback on failure
+        setTimers(originalTimers);
+        setAllTimers(originalAllTimers);
+        alert("Failed to update timer");
       }
     } catch (error) {
+      // Rollback on error
+      setTimers(originalTimers);
+      setAllTimers(originalAllTimers);
       console.error("Error updating timer:", error);
       alert("Failed to update timer");
     }
@@ -192,6 +225,12 @@ export default function DashboardPage() {
       alert("Failed to delete some timers");
     }
   };
+
+  // Pagination logic
+  const totalPages = Math.ceil(timers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedTimers = timers.slice(startIndex, endIndex);
 
   if (status === "loading" || loading) {
     return (
@@ -327,7 +366,7 @@ export default function DashboardPage() {
               {/* List View */}
               {viewMode === "list" && (
                 <div className="divide-y divide-slate-700">
-                  {timers.map((timer) => (
+                  {paginatedTimers.map((timer) => (
                     <div
                       key={timer.id}
                       className="p-6 hover:bg-slate-800/20 transition cursor-pointer"
@@ -431,7 +470,7 @@ export default function DashboardPage() {
               {/* Grid View */}
               {viewMode === "grid" && (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-                  {timers.map((timer) => (
+                  {paginatedTimers.map((timer) => (
                     <div
                       key={timer.id}
                       className={`bg-slate-800/50 border rounded-xl overflow-hidden transition cursor-pointer ${
@@ -530,6 +569,56 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Pagination Controls */}
+              {timers.length > itemsPerPage && (
+                <div className="p-6 border-t border-slate-700 flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    ← Previous
+                  </button>
+                  
+                  <div className="flex items-center gap-2">
+                    {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          className={`w-10 h-10 rounded-lg font-semibold transition ${
+                            currentPage === pageNum
+                              ? "bg-purple-600 text-white"
+                              : "bg-slate-700 hover:bg-slate-600 text-slate-300"
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage >= totalPages}
+                    className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  >
+                    Next →
+                  </button>
                 </div>
               )}
             </>

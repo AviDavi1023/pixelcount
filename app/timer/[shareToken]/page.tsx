@@ -40,6 +40,7 @@ export default function TimerViewPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
   useEffect(() => {
     fetchTimer();
@@ -106,6 +107,17 @@ export default function TimerViewPage() {
   };
 
   const toggleLike = async () => {
+    // Prevent rapid clicking (debounce)
+    if (isLiking) return;
+    
+    setIsLiking(true);
+    
+    // Optimistic UI update
+    const previousLiked = isLiked;
+    const previousCount = likeCount;
+    setIsLiked(!isLiked);
+    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+
     try {
       const response = await fetch(`/api/timers/${shareToken}/like`, {
         method: "POST",
@@ -113,11 +125,26 @@ export default function TimerViewPage() {
       const data = await response.json();
       
       if (response.ok) {
+        // Update with server response
         setIsLiked(data.liked);
-        setLikeCount((prev) => (data.liked ? prev + 1 : prev - 1));
+        setLikeCount((prev) => {
+          const diff = data.liked ? 1 : -1;
+          // Ensure count doesn't go negative
+          return Math.max(0, previousCount + diff);
+        });
+      } else {
+        // Rollback on error
+        setIsLiked(previousLiked);
+        setLikeCount(previousCount);
       }
     } catch (error) {
       console.error("Error toggling like:", error);
+      // Rollback on error
+      setIsLiked(previousLiked);
+      setLikeCount(previousCount);
+    } finally {
+      // Debounce: wait 500ms before allowing another click
+      setTimeout(() => setIsLiking(false), 500);
     }
   };
 

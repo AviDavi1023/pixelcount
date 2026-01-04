@@ -32,30 +32,45 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
     fetchTimers();
-  }, [search, sortBy]);
+  }, [search, sortBy, page]);
 
   const fetchTimers = async () => {
     try {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       params.append("sortBy", sortBy);
+      params.append("page", page.toString());
+      params.append("limit", "12");
 
       const response = await fetch(`/api/timers?${params}`);
       const data = await response.json();
       
-      // Ensure data is an array
-      if (Array.isArray(data)) {
+      // Handle both old array format and new pagination format
+      if (data.timers && Array.isArray(data.timers)) {
+        setTimers(data.timers);
+        setTotalPages(data.pagination?.totalPages || 1);
+        setHasMore(data.pagination?.hasMore || false);
+      } else if (Array.isArray(data)) {
         setTimers(data);
+        setTotalPages(1);
+        setHasMore(false);
       } else {
-        console.error("API returned non-array data:", data);
+        console.error("API returned unexpected format:", data);
         setTimers([]);
+        setTotalPages(1);
+        setHasMore(false);
       }
     } catch (error) {
       console.error("Error fetching timers:", error);
       setTimers([]);
+      setTotalPages(1);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
@@ -122,12 +137,18 @@ export default function GalleryPage() {
             type="text"
             placeholder="Search timers..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
             className="flex-1 px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
           />
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
+            onChange={(e) => {
+              setSortBy(e.target.value);
+              setPage(1);
+            }}
             className="px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
           >
             <option value="createdAt">Newest First</option>
@@ -215,6 +236,56 @@ export default function GalleryPage() {
                 )}
               </Link>
             ))}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && timers.length > 0 && totalPages > 1 && (
+          <div className="mt-12 flex items-center justify-center gap-2">
+            <button
+              onClick={() => setPage(Math.max(1, page - 1))}
+              disabled={page === 1}
+              className="px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              ← Previous
+            </button>
+            
+            <div className="flex items-center gap-2">
+              {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                let pageNum;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (page <= 3) {
+                  pageNum = i + 1;
+                } else if (page >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = page - 2 + i;
+                }
+
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`w-10 h-10 rounded-lg font-semibold transition ${
+                      page === pageNum
+                        ? "bg-purple-600 text-white"
+                        : "bg-slate-800/50 border border-slate-700 text-slate-300 hover:bg-slate-800"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
+              disabled={!hasMore}
+              className="px-4 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-white hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              Next →
+            </button>
           </div>
         )}
       </main>
