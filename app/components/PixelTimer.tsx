@@ -7,7 +7,7 @@ interface PixelTimerProps {
   endTime: Date;
   startColor: string;
   endColor: string;
-  fillMode: "random" | "linear" | "solid" | "spiral" | "wave" | "checkerboard";
+  fillMode: "random" | "linear" | "solid" | "checkerboard";
   title?: string;
   showControls?: boolean;
 }
@@ -113,78 +113,6 @@ export default function PixelTimer({
         for (let i = totalPixels - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
-        }
-      } else if (fillMode === "spiral") {
-        // Archimedean spiral from center outward
-        const centerX = Math.floor(width / 2);
-        const centerY = Math.floor(height / 2);
-        const pixels: Array<{index: number, order: number}> = [];
-        const maxDist = Math.sqrt(centerX * centerX + centerY * centerY);
-        
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) {
-            const dx = x - centerX;
-            const dy = y - centerY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const angle = Math.atan2(dy, dx); // -π to π
-            
-            // Archimedean spiral: r = a + b*θ
-            // Convert to order where spiral expands from center
-            // Normalize angle to 0-2π and add full rotations based on distance
-            const normalizedAngle = angle < 0 ? angle + 2 * Math.PI : angle;
-            const spiralTurns = 3; // Number of full rotations
-            const angleWeight = normalizedAngle / (2 * Math.PI); // 0 to 1
-            const distWeight = dist / maxDist; // 0 to 1
-            
-            // Order follows spiral path: distance and angle combined
-            const order = (distWeight * spiralTurns + angleWeight) * totalPixels;
-            
-            pixels.push({
-              index: y * width + x,
-              order
-            });
-          }
-        }
-        
-        pixels.sort((a, b) => a.order - b.order);
-        
-        for (let i = 0; i < totalPixels; i++) {
-          pixelOrder[i] = pixels[i].index;
-        }
-      } else if (fillMode === "wave") {
-        // Horizontal wave pattern that oscillates from left to right
-        const pixels: Array<{index: number, order: number}> = [];
-        const waveCount = 4; // Number of complete waves across the width
-        const maxAmplitude = height * 0.3; // Wave height
-        
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) {
-            // Primary direction: left to right
-            const xProgress = x / width; // 0 to 1
-            
-            // Wave oscillation based on x position
-            const wavePhase = xProgress * waveCount * 2 * Math.PI;
-            const waveOffset = Math.sin(wavePhase) * maxAmplitude;
-            
-            // Calculate distance from current y to the wave center
-            const waveCenterY = height / 2 + waveOffset;
-            const distanceFromWave = Math.abs(y - waveCenterY);
-            
-            // Order: primarily by x, with y distance from wave affecting timing
-            // Pixels closer to the wave center fill first
-            const order = xProgress * totalPixels + distanceFromWave * (width / height);
-            
-            pixels.push({
-              index: y * width + x,
-              order
-            });
-          }
-        }
-        
-        pixels.sort((a, b) => a.order - b.order);
-        
-        for (let i = 0; i < totalPixels; i++) {
-          pixelOrder[i] = pixels[i].index;
         }
       } else if (fillMode === "checkerboard") {
         // Checkerboard pattern

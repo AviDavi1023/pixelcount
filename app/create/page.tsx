@@ -77,7 +77,7 @@ export default function CreatePage() {
       data: {
         title: "Birthday Countdown",
         timerMode: "countdown",
-        fillMode: "spiral",
+        fillMode: "random",
         startColor: "#fbbf24",
         endColor: "#ec4899",
       },
@@ -444,7 +444,7 @@ export default function CreatePage() {
           <div>
             <label className="block text-sm font-semibold text-white mb-2 uppercase tracking-wide">Fill Pattern</label>
             <div className="grid grid-cols-3 gap-3">
-              {["random", "linear", "solid", "spiral", "wave", "checkerboard"].map((mode) => (
+              {["random", "linear", "solid", "checkerboard"].map((mode) => (
                 <button
                   key={mode}
                   type="button"
