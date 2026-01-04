@@ -7,7 +7,7 @@ interface PixelTimerProps {
   endTime: Date;
   startColor: string;
   endColor: string;
-  fillMode: "random" | "linear" | "solid" | "spiral" | "wave" | "checkerboard" | "centerOut" | "cornersIn";
+  fillMode: "random" | "linear" | "solid" | "spiral" | "wave" | "checkerboard";
   title?: string;
   showControls?: boolean;
 }
@@ -115,7 +115,7 @@ export default function PixelTimer({
           [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
         }
       } else if (fillMode === "spiral") {
-        // Spiral from center outward
+        // True spiral - rotates around center as it expands outward
         const centerX = Math.floor(width / 2);
         const centerY = Math.floor(height / 2);
         const pixels: Array<{index: number, order: number}> = [];
@@ -126,8 +126,8 @@ export default function PixelTimer({
             const dy = y - centerY;
             const dist = Math.sqrt(dx * dx + dy * dy);
             const angle = Math.atan2(dy, dx);
-            // Create spiral effect by combining distance and angle
-            const order = dist * 100 + ((angle + Math.PI) / (2 * Math.PI)) * dist * 50;
+            // Spiral effect: distance dominates but angle creates rotation
+            const order = dist * 50 + ((angle + Math.PI) * 300);
             pixels.push({
               index: y * width + x,
               order
@@ -141,14 +141,17 @@ export default function PixelTimer({
           pixelOrder[i] = pixels[i].index;
         }
       } else if (fillMode === "wave") {
-        // Wave pattern - horizontal waves from left to right
+        // Diagonal wave pattern that travels across the canvas
         const pixels: Array<{index: number, order: number}> = [];
         
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
-            // Create wave effect using vertical position with horizontal progression
-            const waveY = (y + Math.sin((x / width) * Math.PI * 8) * (height / 8)) % height;
-            const order = x * height + Math.abs(waveY);
+            // Create a diagonal wave that sweeps across the canvas
+            const diagonal = x * 0.8 + y * 0.2;
+            const waveFrequency = 0.01;
+            const waveAmplitude = width * 0.15;
+            const wave = Math.sin(diagonal * waveFrequency) * waveAmplitude;
+            const order = diagonal + wave;
             pixels.push({
               index: y * width + x,
               order
@@ -176,67 +179,6 @@ export default function PixelTimer({
         }
         
         pixels.sort((a, b) => a.group - b.group);
-        
-        for (let i = 0; i < totalPixels; i++) {
-          pixelOrder[i] = pixels[i].index;
-        }
-      } else if (fillMode === "centerOut") {
-        // Center outward (circular expansion)
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const maxDist = Math.sqrt(centerX * centerX + centerY * centerY);
-        const pixels: Array<{index: number, dist: number, angle: number}> = [];
-        
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) {
-            const dx = x - centerX;
-            const dy = y - centerY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const angle = Math.atan2(dy, dx);
-            pixels.push({
-              index: y * width + x,
-              dist,
-              angle
-            });
-          }
-        }
-        
-        // Sort by distance first, then by angle for consistent fill
-        pixels.sort((a, b) => {
-          const distDiff = a.dist - b.dist;
-          if (Math.abs(distDiff) < 0.1) return a.angle - b.angle;
-          return distDiff;
-        });
-        
-        for (let i = 0; i < totalPixels; i++) {
-          pixelOrder[i] = pixels[i].index;
-        }
-      } else if (fillMode === "cornersIn") {
-        // From corners toward center
-        const centerX = width / 2;
-        const centerY = height / 2;
-        const pixels: Array<{index: number, dist: number, angle: number}> = [];
-        
-        for (let y = 0; y < height; y++) {
-          for (let x = 0; x < width; x++) {
-            const dx = x - centerX;
-            const dy = y - centerY;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const angle = Math.atan2(dy, dx);
-            pixels.push({
-              index: y * width + x,
-              dist,
-              angle
-            });
-          }
-        }
-        
-        // Reverse sort for corners-in, with angle for consistency
-        pixels.sort((a, b) => {
-          const distDiff = b.dist - a.dist;
-          if (Math.abs(distDiff) < 0.1) return a.angle - b.angle;
-          return distDiff;
-        });
         
         for (let i = 0; i < totalPixels; i++) {
           pixelOrder[i] = pixels[i].index;

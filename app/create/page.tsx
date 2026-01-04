@@ -444,7 +444,7 @@ export default function CreatePage() {
           <div>
             <label className="block text-sm font-semibold text-white mb-2 uppercase tracking-wide">Fill Pattern</label>
             <div className="grid grid-cols-3 gap-3">
-              {["random", "linear", "solid", "spiral", "wave", "checkerboard", "centerOut", "cornersIn"].map((mode) => (
+              {["random", "linear", "solid", "spiral", "wave", "checkerboard"].map((mode) => (
                 <button
                   key={mode}
                   type="button"
@@ -455,7 +455,7 @@ export default function CreatePage() {
                       : "bg-slate-800/50 text-slate-400 hover:bg-slate-700/50"
                   }`}
                 >
-                  {mode === "centerOut" ? "Center Out" : mode === "cornersIn" ? "Corners In" : mode}
+                  {mode}
                 </button>
               ))}
             </div>

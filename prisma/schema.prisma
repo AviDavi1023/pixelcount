@@ -69,7 +69,7 @@ model Timer {
   endTime       DateTime
   
   // Visual settings
-  fillMode      String   @default("random") // "random", "linear", "solid", "spiral", "wave", "checkerboard", "centerOut", "cornersIn"
+  fillMode      String   @default("random") // "random", "linear", "solid", "spiral", "wave", "checkerboard"
   startColor    String   @default("#ffffff")
   endColor      String   @default("#000000")
   

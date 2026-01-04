@@ -34,7 +34,7 @@ export default function TimerViewPage() {
   const [error, setError] = useState("");
   const [customStartColor, setCustomStartColor] = useState("");
   const [customEndColor, setCustomEndColor] = useState("");
-  const [customFillMode, setCustomFillMode] = useState<"random" | "linear" | "solid" | "spiral" | "wave" | "checkerboard" | "centerOut" | "cornersIn">("random");
+  const [customFillMode, setCustomFillMode] = useState<"random" | "linear" | "solid" | "spiral" | "wave" | "checkerboard">("random");
   const [showCustomization, setShowCustomization] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
