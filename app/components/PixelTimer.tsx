@@ -10,6 +10,7 @@ interface PixelTimerProps {
   fillMode: "random" | "linear" | "solid";
   title?: string;
   showControls?: boolean;
+  shareToken?: string;
 }
 
 export default function PixelTimer({
@@ -20,6 +21,7 @@ export default function PixelTimer({
   fillMode,
   title,
   showControls = true,
+  shareToken,
 }: PixelTimerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -28,6 +30,7 @@ export default function PixelTimer({
   const [rate, setRate] = useState("");
   const [isPaused, setIsPaused] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [currentFillMode, setCurrentFillMode] = useState<"random" | "linear" | "solid">(fillMode);
 
   const pixelOrderRef = useRef<Uint32Array | undefined>(undefined);
   const imageDataRef = useRef<ImageData | undefined>(undefined);
@@ -43,6 +46,40 @@ export default function PixelTimer({
   useEffect(() => {
     initializeCanvas(true);
   }, []);
+
+  // Cycle fill mode for example timers
+  useEffect(() => {
+    const isExampleTimer = shareToken?.includes("example") || shareToken?.includes("countdown");
+    if (!isExampleTimer) return;
+
+    const cycleInterval = setInterval(() => {
+      // Calculate progress percentage
+      const total = endTime.getTime() - startTime.getTime();
+      const elapsed = Date.now() - startTime.getTime();
+      const progressPercent = (elapsed / total) * 100;
+
+      // Determine available modes based on progress
+      const availableModes: ("random" | "linear")[] = [];
+      
+      if (progressPercent >= 5) {
+        // Cycle between random and linear
+        availableModes.push("random", "linear");
+      } else {
+        // Only random available
+        availableModes.push("random");
+      }
+
+      if (availableModes.length > 1) {
+        setCurrentFillMode(prev => {
+          const currentIndex = availableModes.indexOf(prev as "random" | "linear");
+          const nextIndex = (currentIndex + 1) % availableModes.length;
+          return availableModes[nextIndex];
+        });
+      }
+    }, 8000); // Cycle every 8 seconds
+
+    return () => clearInterval(cycleInterval);
+  }, [shareToken, startTime, endTime]);
 
   const interpolateColor = (start: ReturnType<typeof hexToRGB>, end: ReturnType<typeof hexToRGB>, ratio: number) => {
     return {
@@ -101,14 +138,15 @@ export default function PixelTimer({
     imageDataRef.current = imageData;
 
     // Generate pixel order only if we don't have one yet or if explicitly resetting
-    const currentSeed = `${startColor}-${endColor}-${fillMode}`;
+    const activeFillMode = currentFillMode;
+    const currentSeed = `${startColor}-${endColor}-${activeFillMode}`;
     if (resetPixelOrder || seedRef.current !== currentSeed || !pixelOrderRef.current) {
       const pixelOrder = new Uint32Array(totalPixels);
       for (let i = 0; i < totalPixels; i++) {
         pixelOrder[i] = i;
       }
 
-      if (fillMode === "random") {
+      if (activeFillMode === "random") {
         for (let i = totalPixels - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
@@ -133,7 +171,7 @@ export default function PixelTimer({
     const oldFilledPixels = filledPixelsRef.current;
     filledPixelsRef.current = targetFilled;
 
-    if (fillMode === "solid") {
+    if (currentFillMode === "solid") {
       const progressRatio = targetFilled / totalPixels;
       const startRGB = hexToRGB(startColor);
       const endRGB = hexToRGB(endColor);
@@ -192,7 +230,7 @@ export default function PixelTimer({
 
     // Calculate rate
     const totalDuration = end - start;
-    if (fillMode === "solid") {
+    if (currentFillMode === "solid") {
       const shadesPerMs = 255 / totalDuration;
       const shadesPerSecond = shadesPerMs * 1000;
       const shadesPerMinute = shadesPerSecond * 60;

@@ -149,6 +149,7 @@ export default function TimerViewPage() {
         fillMode={customFillMode}
         title={timer.title}
         showControls={true}
+        shareToken={shareToken}
       />
 
       {/* Timer Info */}

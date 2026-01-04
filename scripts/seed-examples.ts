@@ -32,23 +32,15 @@ async function main() {
   const endOfDay = new Date(now);
   endOfDay.setHours(23, 59, 59, 999);
 
-  // Calculate progress for dynamic fill mode
-  const dayProgress = (now.getTime() - startOfDay.getTime()) / (endOfDay.getTime() - startOfDay.getTime());
-  const dayFillMode = dayProgress > 0.25 ? "solid" : dayProgress > 0.05 ? "linear" : "random";
-
   // Monthly countdown - starts at beginning of month and ends at end of current month
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
   const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-
-  const monthProgress = (now.getTime() - startOfMonth.getTime()) / (endOfMonth.getTime() - startOfMonth.getTime());
-  const monthFillMode = monthProgress > 0.25 ? "solid" : monthProgress > 0.05 ? "linear" : "random";
 
   // Yearly countdown - starts at Jan 1 12:00am and ends at end of current year
   const startOfYear = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
   const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
 
-  const yearProgress = (now.getTime() - startOfYear.getTime()) / (endOfYear.getTime() - startOfYear.getTime());
-  const yearFillMode = yearProgress > 0.25 ? "solid" : yearProgress > 0.05 ? "linear" : "random";
+  // All timers start with random mode - cycling will happen on client side
 
   const exampleTimers = [
     {
@@ -57,7 +49,7 @@ async function main() {
       timerMode: "countdown",
       startTime: startOfDay,
       endTime: endOfDay,
-      fillMode: dayFillMode,
+      fillMode: "random",
       startColor: "#1e293b",
       endColor: "#8b5cf6",
       isPublic: true,
@@ -69,7 +61,7 @@ async function main() {
       timerMode: "countdown",
       startTime: startOfMonth,
       endTime: endOfMonth,
-      fillMode: monthFillMode,
+      fillMode: "random",
       startColor: "#1e293b",
       endColor: "#ec4899",
       isPublic: true,
@@ -81,7 +73,7 @@ async function main() {
       timerMode: "countdown",
       startTime: startOfYear,
       endTime: endOfYear,
-      fillMode: yearFillMode,
+      fillMode: "random",
       startColor: "#1e293b",
       endColor: "#06b6d4",
       isPublic: true,
