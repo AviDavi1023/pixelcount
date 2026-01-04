@@ -11,6 +11,7 @@ interface Timer {
   title: string;
   description: string | null;
   timerMode: string;
+  startTime: string | null;
   endTime: string;
   fillMode: string;
   startColor: string;
@@ -460,7 +461,7 @@ export default function DashboardPage() {
                       {/* Thumbnail */}
                       <div className="h-40 bg-slate-700/50 relative overflow-hidden">
                         <PixelTimerThumbnail
-                          startTime={new Date(timer.createdAt)}
+                          startTime={timer.startTime ? new Date(timer.startTime) : new Date(timer.endTime)}
                           endTime={new Date(timer.endTime)}
                           startColor={timer.startColor}
                           endColor={timer.endColor}
