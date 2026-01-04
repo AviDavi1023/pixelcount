@@ -47,8 +47,18 @@ export default function PixelTimer({
       // Preserve current progress percentage when resizing
       const oldCanvas = canvasRef.current;
       if (oldCanvas) {
-        const oldTotalPixels = oldCanvas.width * oldCanvas.height;
-        const currentProgressRatio = oldTotalPixels > 0 ? filledPixelsRef.current / oldTotalPixels : 0;
+        const oldWidth = oldCanvas.width;
+        const oldHeight = oldCanvas.height;
+        const oldTotalPixels = oldWidth * oldHeight;
+        const oldFilledPixels = filledPixelsRef.current;
+        const currentProgressRatio = oldTotalPixels > 0 ? oldFilledPixels / oldTotalPixels : 0;
+        
+        console.log('RESIZE START:', {
+          oldDimensions: `${oldWidth}x${oldHeight}`,
+          oldTotalPixels,
+          oldFilledPixels,
+          currentProgressRatio: (currentProgressRatio * 100).toFixed(2) + '%'
+        });
         
         // Reinitialize canvas
         initializeCanvas(true);
@@ -56,8 +66,18 @@ export default function PixelTimer({
         // Restore the filled pixels based on progress ratio
         const newCanvas = canvasRef.current;
         if (newCanvas) {
-          const newTotalPixels = newCanvas.width * newCanvas.height;
-          filledPixelsRef.current = Math.floor(newTotalPixels * currentProgressRatio);
+          const newWidth = newCanvas.width;
+          const newHeight = newCanvas.height;
+          const newTotalPixels = newWidth * newHeight;
+          const newFilledPixels = Math.floor(newTotalPixels * currentProgressRatio);
+          filledPixelsRef.current = newFilledPixels;
+          
+          console.log('RESIZE COMPLETE:', {
+            newDimensions: `${newWidth}x${newHeight}`,
+            newTotalPixels,
+            newFilledPixels,
+            expectedProgressRatio: (currentProgressRatio * 100).toFixed(2) + '%'
+          });
         }
       }
     };
