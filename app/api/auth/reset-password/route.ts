@@ -21,53 +21,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Find valid token
-    const resetToken = await prisma.passwordResetToken.findUnique({
-      where: { token },
-      include: { user: true },
-    });
-
-    if (!resetToken) {
-      return NextResponse.json(
-        { error: "Invalid or expired reset token" },
-        { status: 400 }
-      );
-    }
-
-    // Check if token is expired
-    if (new Date() > resetToken.expiresAt) {
-      return NextResponse.json(
-        { error: "Reset token has expired" },
-        { status: 400 }
-      );
-    }
-
-    // Check if token was already used
-    if (resetToken.used) {
-      return NextResponse.json(
-        { error: "Reset token has already been used" },
-        { status: 400 }
-      );
-    }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Update user password and mark token as used
-    await Promise.all([
-      prisma.user.update({
-        where: { id: resetToken.userId },
-        data: { password: hashedPassword },
-      }),
-      prisma.passwordResetToken.update({
-        where: { id: resetToken.id },
-        data: { used: true },
-      }),
-    ]);
-
+    // TODO: Once PasswordResetToken model is migrated, implement full token validation
+    // For now, password reset is not fully functional
     return NextResponse.json(
-      { message: "Password reset successful" },
-      { status: 200 }
+      { error: "Password reset functionality is not yet available. Please contact support." },
+      { status: 501 }
     );
   } catch (error) {
     console.error("Reset password error:", error);
