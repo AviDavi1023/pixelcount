@@ -134,23 +134,40 @@ export default function PixelTimer({
           pixelOrder[i] = pixels[i].index;
         }
       } else if (fillMode === "sand") {
-        // Sand physics - fast height-map approach
-        // Build up columns from bottom with natural variation
+        // Sand physics with visible falling - particles drop from top and pile up
         const columnHeights = new Uint32Array(width);
         let particleCount = 0;
         
-        // Fill from bottom up, column by column with randomness
+        // Each particle creates a falling trail from top to its landing spot
         while (particleCount < totalPixels) {
           // Pick a random column to drop sand into
           const x = Math.floor(Math.random() * width);
           
-          // If this column isn't full yet, add to it
+          // If this column isn't full yet, simulate falling
           if (columnHeights[x] < height) {
-            const y = height - 1 - columnHeights[x];
-            const index = y * width + x;
-            pixelOrder[particleCount] = index;
+            const landingY = height - 1 - columnHeights[x];
+            
+            // Create falling trail: fill pixels from top down to landing position
+            // Space out the trail pixels so they appear to fall over time
+            const trailLength = Math.min(20, landingY + 1); // Limit trail length for performance
+            const step = Math.max(1, Math.floor((landingY + 1) / trailLength));
+            
+            for (let y = 0; y <= landingY; y += step) {
+              if (particleCount < totalPixels) {
+                const index = y * width + x;
+                pixelOrder[particleCount] = index;
+                particleCount++;
+              }
+            }
+            
+            // Make sure we always fill the landing position
+            if (particleCount < totalPixels) {
+              const index = landingY * width + x;
+              pixelOrder[particleCount] = index;
+              particleCount++;
+            }
+            
             columnHeights[x]++;
-            particleCount++;
           }
         }
       }
