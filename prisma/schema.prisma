@@ -69,9 +69,14 @@ model Timer {
   endTime       DateTime
   
   // Visual settings
-  fillMode      String   @default("random") // "random", "linear", "solid"
+  fillMode      String   @default("random") // "random", "linear", "solid", "spiral", "wave", "checkerboard", "centerOut", "cornersIn"
   startColor    String   @default("#ffffff")
   endColor      String   @default("#000000")
+  
+  // Recurring settings
+  isRecurring   Boolean  @default(false)
+  recurrenceType String? // "daily", "weekly", "monthly", "yearly"
+  lastReset     DateTime? // tracks when timer was last reset
   
   // Sharing settings
   isPublic      Boolean  @default(false)

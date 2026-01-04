@@ -48,6 +48,9 @@ export type TimerMinAggregateOutputType = {
   fillMode: string | null
   startColor: string | null
   endColor: string | null
+  isRecurring: boolean | null
+  recurrenceType: string | null
+  lastReset: Date | null
   isPublic: boolean | null
   shareToken: string | null
   createdAt: Date | null
@@ -67,6 +70,9 @@ export type TimerMaxAggregateOutputType = {
   fillMode: string | null
   startColor: string | null
   endColor: string | null
+  isRecurring: boolean | null
+  recurrenceType: string | null
+  lastReset: Date | null
   isPublic: boolean | null
   shareToken: string | null
   createdAt: Date | null
@@ -86,6 +92,9 @@ export type TimerCountAggregateOutputType = {
   fillMode: number
   startColor: number
   endColor: number
+  isRecurring: number
+  recurrenceType: number
+  lastReset: number
   isPublic: number
   shareToken: number
   createdAt: number
@@ -117,6 +126,9 @@ export type TimerMinAggregateInputType = {
   fillMode?: true
   startColor?: true
   endColor?: true
+  isRecurring?: true
+  recurrenceType?: true
+  lastReset?: true
   isPublic?: true
   shareToken?: true
   createdAt?: true
@@ -136,6 +148,9 @@ export type TimerMaxAggregateInputType = {
   fillMode?: true
   startColor?: true
   endColor?: true
+  isRecurring?: true
+  recurrenceType?: true
+  lastReset?: true
   isPublic?: true
   shareToken?: true
   createdAt?: true
@@ -155,6 +170,9 @@ export type TimerCountAggregateInputType = {
   fillMode?: true
   startColor?: true
   endColor?: true
+  isRecurring?: true
+  recurrenceType?: true
+  lastReset?: true
   isPublic?: true
   shareToken?: true
   createdAt?: true
@@ -261,6 +279,9 @@ export type TimerGroupByOutputType = {
   fillMode: string
   startColor: string
   endColor: string
+  isRecurring: boolean
+  recurrenceType: string | null
+  lastReset: Date | null
   isPublic: boolean
   shareToken: string
   createdAt: Date
@@ -303,6 +324,9 @@ export type TimerWhereInput = {
   fillMode?: Prisma.StringFilter<"Timer"> | string
   startColor?: Prisma.StringFilter<"Timer"> | string
   endColor?: Prisma.StringFilter<"Timer"> | string
+  isRecurring?: Prisma.BoolFilter<"Timer"> | boolean
+  recurrenceType?: Prisma.StringNullableFilter<"Timer"> | string | null
+  lastReset?: Prisma.DateTimeNullableFilter<"Timer"> | Date | string | null
   isPublic?: Prisma.BoolFilter<"Timer"> | boolean
   shareToken?: Prisma.StringFilter<"Timer"> | string
   createdAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
@@ -324,6 +348,9 @@ export type TimerOrderByWithRelationInput = {
   fillMode?: Prisma.SortOrder
   startColor?: Prisma.SortOrder
   endColor?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceType?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastReset?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -349,6 +376,9 @@ export type TimerWhereUniqueInput = Prisma.AtLeast<{
   fillMode?: Prisma.StringFilter<"Timer"> | string
   startColor?: Prisma.StringFilter<"Timer"> | string
   endColor?: Prisma.StringFilter<"Timer"> | string
+  isRecurring?: Prisma.BoolFilter<"Timer"> | boolean
+  recurrenceType?: Prisma.StringNullableFilter<"Timer"> | string | null
+  lastReset?: Prisma.DateTimeNullableFilter<"Timer"> | Date | string | null
   isPublic?: Prisma.BoolFilter<"Timer"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
@@ -369,6 +399,9 @@ export type TimerOrderByWithAggregationInput = {
   fillMode?: Prisma.SortOrder
   startColor?: Prisma.SortOrder
   endColor?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceType?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastReset?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -396,6 +429,9 @@ export type TimerScalarWhereWithAggregatesInput = {
   fillMode?: Prisma.StringWithAggregatesFilter<"Timer"> | string
   startColor?: Prisma.StringWithAggregatesFilter<"Timer"> | string
   endColor?: Prisma.StringWithAggregatesFilter<"Timer"> | string
+  isRecurring?: Prisma.BoolWithAggregatesFilter<"Timer"> | boolean
+  recurrenceType?: Prisma.StringNullableWithAggregatesFilter<"Timer"> | string | null
+  lastReset?: Prisma.DateTimeNullableWithAggregatesFilter<"Timer"> | Date | string | null
   isPublic?: Prisma.BoolWithAggregatesFilter<"Timer"> | boolean
   shareToken?: Prisma.StringWithAggregatesFilter<"Timer"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Timer"> | Date | string
@@ -414,6 +450,9 @@ export type TimerCreateInput = {
   fillMode?: string
   startColor?: string
   endColor?: string
+  isRecurring?: boolean
+  recurrenceType?: string | null
+  lastReset?: Date | string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
@@ -435,6 +474,9 @@ export type TimerUncheckedCreateInput = {
   fillMode?: string
   startColor?: string
   endColor?: string
+  isRecurring?: boolean
+  recurrenceType?: string | null
+  lastReset?: Date | string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
@@ -454,6 +496,9 @@ export type TimerUpdateInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -475,6 +520,9 @@ export type TimerUncheckedUpdateInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -495,6 +543,9 @@ export type TimerCreateManyInput = {
   fillMode?: string
   startColor?: string
   endColor?: string
+  isRecurring?: boolean
+  recurrenceType?: string | null
+  lastReset?: Date | string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
@@ -513,6 +564,9 @@ export type TimerUpdateManyMutationInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -532,6 +586,9 @@ export type TimerUncheckedUpdateManyInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -561,6 +618,9 @@ export type TimerCountOrderByAggregateInput = {
   fillMode?: Prisma.SortOrder
   startColor?: Prisma.SortOrder
   endColor?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceType?: Prisma.SortOrder
+  lastReset?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -585,6 +645,9 @@ export type TimerMaxOrderByAggregateInput = {
   fillMode?: Prisma.SortOrder
   startColor?: Prisma.SortOrder
   endColor?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceType?: Prisma.SortOrder
+  lastReset?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -604,6 +667,9 @@ export type TimerMinOrderByAggregateInput = {
   fillMode?: Prisma.SortOrder
   startColor?: Prisma.SortOrder
   endColor?: Prisma.SortOrder
+  isRecurring?: Prisma.SortOrder
+  recurrenceType?: Prisma.SortOrder
+  lastReset?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -700,6 +766,9 @@ export type TimerCreateWithoutUserInput = {
   fillMode?: string
   startColor?: string
   endColor?: string
+  isRecurring?: boolean
+  recurrenceType?: string | null
+  lastReset?: Date | string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
@@ -719,6 +788,9 @@ export type TimerUncheckedCreateWithoutUserInput = {
   fillMode?: string
   startColor?: string
   endColor?: string
+  isRecurring?: boolean
+  recurrenceType?: string | null
+  lastReset?: Date | string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
@@ -768,6 +840,9 @@ export type TimerScalarWhereInput = {
   fillMode?: Prisma.StringFilter<"Timer"> | string
   startColor?: Prisma.StringFilter<"Timer"> | string
   endColor?: Prisma.StringFilter<"Timer"> | string
+  isRecurring?: Prisma.BoolFilter<"Timer"> | boolean
+  recurrenceType?: Prisma.StringNullableFilter<"Timer"> | string | null
+  lastReset?: Prisma.DateTimeNullableFilter<"Timer"> | Date | string | null
   isPublic?: Prisma.BoolFilter<"Timer"> | boolean
   shareToken?: Prisma.StringFilter<"Timer"> | string
   createdAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
@@ -786,6 +861,9 @@ export type TimerCreateWithoutLikesInput = {
   fillMode?: string
   startColor?: string
   endColor?: string
+  isRecurring?: boolean
+  recurrenceType?: string | null
+  lastReset?: Date | string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
@@ -806,6 +884,9 @@ export type TimerUncheckedCreateWithoutLikesInput = {
   fillMode?: string
   startColor?: string
   endColor?: string
+  isRecurring?: boolean
+  recurrenceType?: string | null
+  lastReset?: Date | string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
@@ -840,6 +921,9 @@ export type TimerUpdateWithoutLikesInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -860,6 +944,9 @@ export type TimerUncheckedUpdateWithoutLikesInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -878,6 +965,9 @@ export type TimerCreateManyUserInput = {
   fillMode?: string
   startColor?: string
   endColor?: string
+  isRecurring?: boolean
+  recurrenceType?: string | null
+  lastReset?: Date | string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
@@ -896,6 +986,9 @@ export type TimerUpdateWithoutUserInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -915,6 +1008,9 @@ export type TimerUncheckedUpdateWithoutUserInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -934,6 +1030,9 @@ export type TimerUncheckedUpdateManyWithoutUserInput = {
   fillMode?: Prisma.StringFieldUpdateOperationsInput | string
   startColor?: Prisma.StringFieldUpdateOperationsInput | string
   endColor?: Prisma.StringFieldUpdateOperationsInput | string
+  isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -984,6 +1083,9 @@ export type TimerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   fillMode?: boolean
   startColor?: boolean
   endColor?: boolean
+  isRecurring?: boolean
+  recurrenceType?: boolean
+  lastReset?: boolean
   isPublic?: boolean
   shareToken?: boolean
   createdAt?: boolean
@@ -1006,6 +1108,9 @@ export type TimerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   fillMode?: boolean
   startColor?: boolean
   endColor?: boolean
+  isRecurring?: boolean
+  recurrenceType?: boolean
+  lastReset?: boolean
   isPublic?: boolean
   shareToken?: boolean
   createdAt?: boolean
@@ -1026,6 +1131,9 @@ export type TimerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   fillMode?: boolean
   startColor?: boolean
   endColor?: boolean
+  isRecurring?: boolean
+  recurrenceType?: boolean
+  lastReset?: boolean
   isPublic?: boolean
   shareToken?: boolean
   createdAt?: boolean
@@ -1046,6 +1154,9 @@ export type TimerSelectScalar = {
   fillMode?: boolean
   startColor?: boolean
   endColor?: boolean
+  isRecurring?: boolean
+  recurrenceType?: boolean
+  lastReset?: boolean
   isPublic?: boolean
   shareToken?: boolean
   createdAt?: boolean
@@ -1053,7 +1164,7 @@ export type TimerSelectScalar = {
   viewCount?: boolean
 }
 
-export type TimerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "userId" | "timerMode" | "duration" | "startTime" | "endTime" | "fillMode" | "startColor" | "endColor" | "isPublic" | "shareToken" | "createdAt" | "updatedAt" | "viewCount", ExtArgs["result"]["timer"]>
+export type TimerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "userId" | "timerMode" | "duration" | "startTime" | "endTime" | "fillMode" | "startColor" | "endColor" | "isRecurring" | "recurrenceType" | "lastReset" | "isPublic" | "shareToken" | "createdAt" | "updatedAt" | "viewCount", ExtArgs["result"]["timer"]>
 export type TimerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Timer$userArgs<ExtArgs>
   likes?: boolean | Prisma.Timer$likesArgs<ExtArgs>
@@ -1084,6 +1195,9 @@ export type $TimerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     fillMode: string
     startColor: string
     endColor: string
+    isRecurring: boolean
+    recurrenceType: string | null
+    lastReset: Date | null
     isPublic: boolean
     shareToken: string
     createdAt: Date
@@ -1525,6 +1639,9 @@ export interface TimerFieldRefs {
   readonly fillMode: Prisma.FieldRef<"Timer", 'String'>
   readonly startColor: Prisma.FieldRef<"Timer", 'String'>
   readonly endColor: Prisma.FieldRef<"Timer", 'String'>
+  readonly isRecurring: Prisma.FieldRef<"Timer", 'Boolean'>
+  readonly recurrenceType: Prisma.FieldRef<"Timer", 'String'>
+  readonly lastReset: Prisma.FieldRef<"Timer", 'DateTime'>
   readonly isPublic: Prisma.FieldRef<"Timer", 'Boolean'>
   readonly shareToken: Prisma.FieldRef<"Timer", 'String'>
   readonly createdAt: Prisma.FieldRef<"Timer", 'DateTime'>

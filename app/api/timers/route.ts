@@ -94,6 +94,8 @@ export async function POST(request: NextRequest) {
       startColor,
       endColor,
       isPublic,
+      isRecurring,
+      recurrenceType,
     } = body;
 
     // Validation
@@ -112,6 +114,10 @@ export async function POST(request: NextRequest) {
         endTime: new Date(endTime),
         fillMode,
         startColor,
+        endColor,
+        isPublic: session?.user ? isPublic || false : false,
+        isRecurring: isRecurring || false,
+        recurrenceType: recurrenceType || null,
         endColor,
         isPublic: session?.user ? isPublic || false : false,
         userId: session?.user?.email

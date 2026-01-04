@@ -7,7 +7,7 @@ interface PixelTimerProps {
   endTime: Date;
   startColor: string;
   endColor: string;
-  fillMode: "random" | "linear" | "solid";
+  fillMode: "random" | "linear" | "solid" | "spiral" | "wave" | "checkerboard" | "centerOut" | "cornersIn";
   title?: string;
   showControls?: boolean;
 }
@@ -109,9 +109,124 @@ export default function PixelTimer({
       }
 
       if (fillMode === "random") {
+        // Random shuffling
         for (let i = totalPixels - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [pixelOrder[i], pixelOrder[j]] = [pixelOrder[j], pixelOrder[i]];
+        }
+      } else if (fillMode === "spiral") {
+        // Spiral from center outward
+        const centerX = Math.floor(width / 2);
+        const centerY = Math.floor(height / 2);
+        const pixels: Array<{index: number, dist: number, angle: number}> = [];
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+            pixels.push({
+              index: y * width + x,
+              dist,
+              angle
+            });
+          }
+        }
+        
+        pixels.sort((a, b) => {
+          const distDiff = a.dist - b.dist;
+          if (Math.abs(distDiff) < 1) return a.angle - b.angle;
+          return distDiff;
+        });
+        
+        for (let i = 0; i < totalPixels; i++) {
+          pixelOrder[i] = pixels[i].index;
+        }
+      } else if (fillMode === "wave") {
+        // Wave pattern from left to right with sinusoidal variation
+        const pixels: Array<{index: number, order: number}> = [];
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const waveOffset = Math.sin((x / width) * Math.PI * 4) * height / 4;
+            const order = x * height + y + waveOffset;
+            pixels.push({
+              index: y * width + x,
+              order
+            });
+          }
+        }
+        
+        pixels.sort((a, b) => a.order - b.order);
+        
+        for (let i = 0; i < totalPixels; i++) {
+          pixelOrder[i] = pixels[i].index;
+        }
+      } else if (fillMode === "checkerboard") {
+        // Checkerboard pattern
+        const pixels: Array<{index: number, group: number}> = [];
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const group = (Math.floor(x / 20) + Math.floor(y / 20)) % 2;
+            pixels.push({
+              index: y * width + x,
+              group
+            });
+          }
+        }
+        
+        pixels.sort((a, b) => a.group - b.group);
+        
+        for (let i = 0; i < totalPixels; i++) {
+          pixelOrder[i] = pixels[i].index;
+        }
+      } else if (fillMode === "centerOut") {
+        // Center outward (circular expansion)
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const pixels: Array<{index: number, dist: number}> = [];
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            pixels.push({
+              index: y * width + x,
+              dist
+            });
+          }
+        }
+        
+        pixels.sort((a, b) => a.dist - b.dist);
+        
+        for (let i = 0; i < totalPixels; i++) {
+          pixelOrder[i] = pixels[i].index;
+        }
+      } else if (fillMode === "cornersIn") {
+        // From corners toward center
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const pixels: Array<{index: number, dist: number}> = [];
+        
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const dx = x - centerX;
+            const dy = y - centerY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            pixels.push({
+              index: y * width + x,
+              dist
+            });
+          }
+        }
+        
+        pixels.sort((a, b) => b.dist - a.dist); // Reverse sort for corners-in
+        
+        for (let i = 0; i < totalPixels; i++) {
+          pixelOrder[i] = pixels[i].index;
         }
       }
 
