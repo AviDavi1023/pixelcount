@@ -15,6 +15,32 @@ export default function Home() {
     fetchExampleTimers();
   }, []);
 
+  const adjustTimerForTimezone = (timerData: any) => {
+    const now = new Date();
+    
+    if (timerData.shareToken === "daily-countdown-example") {
+      const startOfDay = new Date(now);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(now);
+      endOfDay.setHours(23, 59, 59, 999);
+      return { ...timerData, startTime: startOfDay.toISOString(), endTime: endOfDay.toISOString() };
+    }
+    
+    if (timerData.shareToken === "monthly-countdown-example") {
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      return { ...timerData, startTime: startOfMonth.toISOString(), endTime: endOfMonth.toISOString() };
+    }
+    
+    if (timerData.shareToken === "yearly-countdown-example") {
+      const startOfYear = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+      const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+      return { ...timerData, startTime: startOfYear.toISOString(), endTime: endOfYear.toISOString() };
+    }
+    
+    return timerData;
+  };
+
   const regenerateExampleTimers = async () => {
     try {
       await fetch("/api/timers/regenerate-examples", { method: "POST" });
@@ -36,7 +62,9 @@ export default function Home() {
         t.shareToken.includes("monthly-countdown") ||
         t.shareToken.includes("yearly-countdown")
       ).slice(0, 3);
-      setExampleTimers(examples);
+      // Adjust times for user's timezone
+      const adjustedExamples = examples.map(adjustTimerForTimezone);
+      setExampleTimers(adjustedExamples);
     } catch (error) {
       console.error("Error fetching example timers:", error);
     }

@@ -77,6 +77,36 @@ export default function TimerViewPage() {
     checkLikeStatus();
   }, [shareToken]);
 
+  // Adjust timer times for special recurring timers based on user's local timezone
+  const adjustTimerForTimezone = (timerData: any) => {
+    const now = new Date();
+    
+    if (timerData.shareToken === "daily-countdown-example") {
+      // Set to start/end of current day in user's local timezone
+      const startOfDay = new Date(now);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(now);
+      endOfDay.setHours(23, 59, 59, 999);
+      return { ...timerData, startTime: startOfDay.toISOString(), endTime: endOfDay.toISOString() };
+    }
+    
+    if (timerData.shareToken === "monthly-countdown-example") {
+      // Set to start/end of current month in user's local timezone
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+      return { ...timerData, startTime: startOfMonth.toISOString(), endTime: endOfMonth.toISOString() };
+    }
+    
+    if (timerData.shareToken === "yearly-countdown-example") {
+      // Set to start/end of current year in user's local timezone
+      const startOfYear = new Date(now.getFullYear(), 0, 1, 0, 0, 0, 0);
+      const endOfYear = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+      return { ...timerData, startTime: startOfYear.toISOString(), endTime: endOfYear.toISOString() };
+    }
+    
+    return timerData;
+  };
+
   const fetchTimer = async () => {
     try {
       const response = await fetch(`/api/timers/${shareToken}`);
@@ -84,11 +114,12 @@ export default function TimerViewPage() {
         throw new Error("Timer not found");
       }
       const data = await response.json();
-      setTimer(data);
-      setLikeCount(data._count.likes);
-      setCustomStartColor(data.startColor);
-      setCustomEndColor(data.endColor);
-      setCustomFillMode(data.fillMode);
+      const adjustedData = adjustTimerForTimezone(data);
+      setTimer(adjustedData);
+      setLikeCount(adjustedData._count.likes);
+      setCustomStartColor(adjustedData.startColor);
+      setCustomEndColor(adjustedData.endColor);
+      setCustomFillMode(adjustedData.fillMode);
     } catch (err: any) {
       setError(err.message);
     } finally {
