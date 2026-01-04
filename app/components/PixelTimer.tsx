@@ -33,6 +33,10 @@ export default function PixelTimer({
   const imageDataRef = useRef<ImageData | undefined>(undefined);
   const filledPixelsRef = useRef(0);
   const seedRef = useRef<string>("");
+  
+  // Use fixed logical resolution for consistency across displays
+  const LOGICAL_WIDTH = 1920;
+  const LOGICAL_HEIGHT = 1080;
 
   const hexToRGB = (hex: string) => {
     const num = parseInt(hex.slice(1), 16);
@@ -79,8 +83,9 @@ export default function PixelTimer({
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
-    const width = (canvas.width = window.innerWidth);
-    const height = (canvas.height = window.innerHeight);
+    // Use fixed logical resolution instead of actual window size
+    const width = (canvas.width = LOGICAL_WIDTH);
+    const height = (canvas.height = LOGICAL_HEIGHT);
     const totalPixels = width * height;
 
     const startRGB = hexToRGB(startColor);
@@ -248,37 +253,14 @@ export default function PixelTimer({
   useEffect(() => {
     initializeCanvas(false);
 
-    const handleResize = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const now = Date.now();
-      const start = startTime.getTime();
-      const end = endTime.getTime();
-
-      let currentProgress = 0;
-      if (now >= end) {
-        currentProgress = 1;
-      } else if (now > start) {
-        currentProgress = (now - start) / (end - start);
-      }
-
-      initializeCanvas(false);
-      if (canvas) {
-        const totalPixels = canvas.width * canvas.height;
-        filledPixelsRef.current = Math.floor(currentProgress * totalPixels);
-        fillPixels(filledPixelsRef.current);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
+    // No need for resize handler since we use fixed resolution
+    // Canvas will scale via CSS to fit any display
 
     if (!isPaused) {
       animationFrameRef.current = requestAnimationFrame(drawFrame);
     }
 
     return () => {
-      window.removeEventListener("resize", handleResize);
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
@@ -287,7 +269,14 @@ export default function PixelTimer({
 
   return (
     <div className="fixed inset-0">
-      <canvas ref={canvasRef} className="absolute inset-0" />
+      <canvas 
+        ref={canvasRef} 
+        className="absolute inset-0 w-full h-full"
+        style={{ 
+          objectFit: 'cover',
+          imageRendering: 'pixelated'
+        }}
+      />
 
       {/* Title Display */}
       {title && !isComplete && (
@@ -303,6 +292,7 @@ export default function PixelTimer({
             <div className="text-5xl font-bold text-white mb-2">{progress.toFixed(2)}%</div>
             <div className="text-sm text-white/60 font-medium">{timeRemaining} remaining</div>
             <div className="text-xs text-white/50 font-medium mt-1">{rate}</div>
+            <div className="text-xs text-white/40 font-medium mt-1">1920×1080 resolution</div>
           </div>
         </div>
       )}
