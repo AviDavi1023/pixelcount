@@ -77,6 +77,14 @@ export default function GalleryPage() {
     return `${minutes}m`;
   };
 
+  const isCompleted = (endTime: string) => {
+    return new Date(endTime).getTime() < new Date().getTime();
+  };
+
+  const isExampleTimer = (shareToken: string) => {
+    return shareToken.includes('example') || shareToken.includes('countdown');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900">
       {/* Navigation */}
@@ -144,8 +152,24 @@ export default function GalleryPage() {
               <Link
                 key={timer.id}
                 href={`/timer/${timer.shareToken}`}
-                className="block bg-slate-800/30 border border-slate-700 rounded-xl p-6 hover:border-purple-500 hover:bg-slate-800/50 transition group"
+                className="block bg-slate-800/30 border border-slate-700 rounded-xl p-6 hover:border-purple-500 hover:bg-slate-800/50 transition group relative"
               >
+                {/* Pin Icon for Example Timers */}
+                {isExampleTimer(timer.shareToken) && (
+                  <div className="absolute top-4 right-4 z-10 bg-yellow-500/20 backdrop-blur-sm rounded-full p-2 border border-yellow-500/30">
+                    <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" />
+                    </svg>
+                  </div>
+                )}
+
+                {/* Completed Banner */}
+                {isCompleted(timer.endTime) && (
+                  <div className="absolute top-4 left-4 z-10 bg-green-500/20 backdrop-blur-sm rounded-lg px-3 py-1 border border-green-500/30">
+                    <span className="text-green-400 text-xs font-semibold">✓ COMPLETED</span>
+                  </div>
+                )}
+
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-white mb-1 group-hover:text-purple-400 transition">

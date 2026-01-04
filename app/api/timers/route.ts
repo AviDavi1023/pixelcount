@@ -50,7 +50,26 @@ export async function GET(request: NextRequest) {
       take: 50,
     });
 
-    return NextResponse.json(timers);
+    // Filter out timers completed for more than 1 hour
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    const filteredTimers = timers.filter(timer => {
+      const endTime = new Date(timer.endTime);
+      // Keep if not completed or completed less than 1 hour ago
+      return endTime > oneHourAgo;
+    });
+
+    // Sort: pin example timers to top, then by requested sort
+    const sortedTimers = filteredTimers.sort((a, b) => {
+      const aIsExample = a.shareToken.includes('example') || a.shareToken.includes('countdown');
+      const bIsExample = b.shareToken.includes('example') || b.shareToken.includes('countdown');
+      
+      if (aIsExample && !bIsExample) return -1;
+      if (!aIsExample && bIsExample) return 1;
+      return 0; // Keep original order for non-examples
+    });
+
+    return NextResponse.json(sortedTimers);
   } catch (error: any) {
     console.error("Error fetching timers:", error);
     // Return empty array on error to prevent frontend crashes
