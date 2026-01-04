@@ -11,8 +11,17 @@ export default function Home() {
   const [exampleTimers, setExampleTimers] = useState<any[]>([]);
 
   useEffect(() => {
+    regenerateExampleTimers();
     fetchExampleTimers();
   }, []);
+
+  const regenerateExampleTimers = async () => {
+    try {
+      await fetch("/api/timers/regenerate-examples", { method: "POST" });
+    } catch (error) {
+      console.error("Error regenerating example timers:", error);
+    }
+  };
 
   const fetchExampleTimers = async () => {
     try {
