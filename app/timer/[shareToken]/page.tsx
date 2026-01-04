@@ -34,11 +34,42 @@ export default function TimerViewPage() {
   const [error, setError] = useState("");
   const [customStartColor, setCustomStartColor] = useState("");
   const [customEndColor, setCustomEndColor] = useState("");
-  const [customFillMode, setCustomFillMode] = useState<"random" | "linear" | "solid">("random");
+  const [customFillMode, setCustomFillMode] = useState<"random" | "linear" | "solid" | "spiral" | "wave" | "checkerboard" | "centerOut" | "cornersIn">("random");
   const [showCustomization, setShowCustomization] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    fetchTimer();
+    checkLikeStatus();
+    
+    // Check URL params for embed mode
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('embed') === 'true') {
+      setIsFullscreen(true);
+    }
+  }, [shareToken]);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   useEffect(() => {
     fetchTimer();
@@ -91,13 +122,15 @@ export default function TimerViewPage() {
   };
 
   const copyShareLink = () => {
-    const url = window.location.href;
+    const url = window.location.origin + window.location.pathname;
     navigator.clipboard.writeText(url);
     alert("Link copied to clipboard!");
   };
 
   const copyEmbedCode = () => {
-    const embedCode = `<iframe src="${window.location.href}" width="100%" height="600" frameborder="0"></iframe>`;
+    const baseUrl = window.location.origin + window.location.pathname;
+    const embedUrl = `${baseUrl}?embed=true`;
+    const embedCode = `<iframe src="${embedUrl}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>`;
     navigator.clipboard.writeText(embedCode);
     alert("Embed code copied to clipboard!");
   };
@@ -162,61 +195,78 @@ export default function TimerViewPage() {
       </div>
 
       {/* Back Button - Top Left */}
-      <Link
-        href="/gallery"
-        className="fixed top-8 left-8 z-30 p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
-        title="Back to Gallery"
-      >
-        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-      </Link>
+      {!isFullscreen && (
+        <Link
+          href="/gallery"
+          className="fixed top-8 left-8 z-30 p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
+          title="Back to Gallery"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+        </Link>
+      )}
 
       {/* Floating Action Buttons */}
-      <div className="fixed top-8 right-8 z-30 flex flex-col gap-3">
-        <button
-          onClick={toggleLike}
-          className={`p-4 backdrop-blur-xl rounded-full border transition ${
-            isLiked
-              ? "bg-red-500/80 border-red-400/50 hover:bg-red-600/80"
-              : "bg-black/75 border-white/20 hover:bg-black/90"
-          }`}
-          title={isLiked ? "Unlike" : "Like"}
-        >
-          <div className="flex flex-col items-center gap-1">
-            <svg
-              className="w-6 h-6 text-white"
-              fill={isLiked ? "currentColor" : "none"}
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-              />
+      {!isFullscreen && (
+        <div className="fixed top-8 right-8 z-30 flex flex-col gap-3">
+          <button
+            onClick={toggleLike}
+            className={`p-4 backdrop-blur-xl rounded-full border transition ${
+              isLiked
+                ? "bg-red-500/80 border-red-400/50 hover:bg-red-600/80"
+                : "bg-black/75 border-white/20 hover:bg-black/90"
+            }`}
+            title={isLiked ? "Unlike" : "Like"}
+          >
+            <div className="flex flex-col items-center gap-1">
+              <svg
+                className="w-6 h-6 text-white"
+                fill={isLiked ? "currentColor" : "none"}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+              <span className="text-xs text-white font-medium">{likeCount}</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setShowCustomization(!showCustomization)}
+            className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
+            title="Customize"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>
-            <span className="text-xs text-white font-medium">{likeCount}</span>
-          </div>
-        </button>
+          </button>
 
-        <button
-          onClick={() => setShowCustomization(!showCustomization)}
-          className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
-          title="Customize"
-        >
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-          </svg>
-        </button>
+          <button
+            onClick={toggleFullscreen}
+            className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
+            title="Toggle Fullscreen"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isFullscreen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              )}
+            </svg>
+          </button>
 
-        <button
-          onClick={() => setShowShareMenu(!showShareMenu)}
-          className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
-          title="Share"
-        >
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button
+            onClick={() => setShowShareMenu(!showShareMenu)}
+            className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
+            title="Share"
+          >
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
           </svg>
         </button>
