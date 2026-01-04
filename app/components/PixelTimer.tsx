@@ -44,40 +44,38 @@ export default function PixelTimer({
     initializeCanvas(true);
     
     const handleResize = () => {
-      // Preserve current progress percentage when resizing
-      const oldCanvas = canvasRef.current;
-      if (oldCanvas) {
-        const oldWidth = oldCanvas.width;
-        const oldHeight = oldCanvas.height;
-        const oldTotalPixels = oldWidth * oldHeight;
-        const oldFilledPixels = filledPixelsRef.current;
-        const currentProgressRatio = oldTotalPixels > 0 ? oldFilledPixels / oldTotalPixels : 0;
-        
-        console.log('RESIZE START:', {
-          oldDimensions: `${oldWidth}x${oldHeight}`,
-          oldTotalPixels,
-          oldFilledPixels,
-          currentProgressRatio: (currentProgressRatio * 100).toFixed(2) + '%'
-        });
-        
-        // Reinitialize canvas
-        initializeCanvas(true);
-        
-        // Restore the filled pixels based on progress ratio
-        const newCanvas = canvasRef.current;
-        if (newCanvas) {
-          const newWidth = newCanvas.width;
-          const newHeight = newCanvas.height;
-          const newTotalPixels = newWidth * newHeight;
-          const newFilledPixels = Math.floor(newTotalPixels * currentProgressRatio);
-          filledPixelsRef.current = newFilledPixels;
+      console.log('RESIZE EVENT FIRED');
+      // On resize, just reinitialize the canvas without resetting pixel order
+      // The progress will be recalculated from elapsed time, not from pixels
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (ctx) {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
           
-          console.log('RESIZE COMPLETE:', {
-            newDimensions: `${newWidth}x${newHeight}`,
-            newTotalPixels,
-            newFilledPixels,
-            expectedProgressRatio: (currentProgressRatio * 100).toFixed(2) + '%'
-          });
+          // Reset canvas to start color
+          const startRGB = hexToRGB(startColor);
+          ctx.fillStyle = startColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // Reset image data with new dimensions
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          
+          for (let i = 0; i < data.length; i += 4) {
+            data[i] = startRGB.r;
+            data[i + 1] = startRGB.g;
+            data[i + 2] = startRGB.b;
+            data[i + 3] = 255;
+          }
+          
+          ctx.putImageData(imageData, 0, 0);
+          imageDataRef.current = imageData;
+          
+          // Reset filled pixels counter - progress will be recalculated from time
+          filledPixelsRef.current = 0;
+          console.log('Canvas resized to:', canvas.width, 'x', canvas.height);
         }
       }
     };
