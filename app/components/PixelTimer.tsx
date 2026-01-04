@@ -118,7 +118,7 @@ export default function PixelTimer({
         // Spiral from center outward
         const centerX = Math.floor(width / 2);
         const centerY = Math.floor(height / 2);
-        const pixels: Array<{index: number, dist: number, angle: number}> = [];
+        const pixels: Array<{index: number, order: number}> = [];
         
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
@@ -126,31 +126,29 @@ export default function PixelTimer({
             const dy = y - centerY;
             const dist = Math.sqrt(dx * dx + dy * dy);
             const angle = Math.atan2(dy, dx);
+            // Create spiral effect by combining distance and angle
+            const order = dist * 100 + ((angle + Math.PI) / (2 * Math.PI)) * dist * 50;
             pixels.push({
               index: y * width + x,
-              dist,
-              angle
+              order
             });
           }
         }
         
-        pixels.sort((a, b) => {
-          const distDiff = a.dist - b.dist;
-          if (Math.abs(distDiff) < 1) return a.angle - b.angle;
-          return distDiff;
-        });
+        pixels.sort((a, b) => a.order - b.order);
         
         for (let i = 0; i < totalPixels; i++) {
           pixelOrder[i] = pixels[i].index;
         }
       } else if (fillMode === "wave") {
-        // Wave pattern from left to right with sinusoidal variation
+        // Wave pattern - horizontal waves from left to right
         const pixels: Array<{index: number, order: number}> = [];
         
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
-            const waveOffset = Math.sin((x / width) * Math.PI * 4) * height / 4;
-            const order = x * height + y + waveOffset;
+            // Create wave effect using vertical position with horizontal progression
+            const waveY = (y + Math.sin((x / width) * Math.PI * 8) * (height / 8)) % height;
+            const order = x * height + Math.abs(waveY);
             pixels.push({
               index: y * width + x,
               order
@@ -186,21 +184,29 @@ export default function PixelTimer({
         // Center outward (circular expansion)
         const centerX = width / 2;
         const centerY = height / 2;
-        const pixels: Array<{index: number, dist: number}> = [];
+        const maxDist = Math.sqrt(centerX * centerX + centerY * centerY);
+        const pixels: Array<{index: number, dist: number, angle: number}> = [];
         
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             const dx = x - centerX;
             const dy = y - centerY;
             const dist = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
             pixels.push({
               index: y * width + x,
-              dist
+              dist,
+              angle
             });
           }
         }
         
-        pixels.sort((a, b) => a.dist - b.dist);
+        // Sort by distance first, then by angle for consistent fill
+        pixels.sort((a, b) => {
+          const distDiff = a.dist - b.dist;
+          if (Math.abs(distDiff) < 0.1) return a.angle - b.angle;
+          return distDiff;
+        });
         
         for (let i = 0; i < totalPixels; i++) {
           pixelOrder[i] = pixels[i].index;
@@ -209,21 +215,28 @@ export default function PixelTimer({
         // From corners toward center
         const centerX = width / 2;
         const centerY = height / 2;
-        const pixels: Array<{index: number, dist: number}> = [];
+        const pixels: Array<{index: number, dist: number, angle: number}> = [];
         
         for (let y = 0; y < height; y++) {
           for (let x = 0; x < width; x++) {
             const dx = x - centerX;
             const dy = y - centerY;
             const dist = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
             pixels.push({
               index: y * width + x,
-              dist
+              dist,
+              angle
             });
           }
         }
         
-        pixels.sort((a, b) => b.dist - a.dist); // Reverse sort for corners-in
+        // Reverse sort for corners-in, with angle for consistency
+        pixels.sort((a, b) => {
+          const distDiff = b.dist - a.dist;
+          if (Math.abs(distDiff) < 0.1) return a.angle - b.angle;
+          return distDiff;
+        });
         
         for (let i = 0; i < totalPixels; i++) {
           pixelOrder[i] = pixels[i].index;
