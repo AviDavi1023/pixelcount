@@ -53,13 +53,23 @@ export default function PixelTimer({
   };
 
   const formatTimeRemaining = (ms: number) => {
-    if (ms <= 0) return "00:00:00";
-    let totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    totalSeconds %= 3600;
-    const minutes = Math.floor(totalSeconds / 60);
+    if (ms <= 0) return "Completed";
+    
+    const totalSeconds = Math.floor(ms / 1000);
+    const days = Math.floor(totalSeconds / (3600 * 24));
+    const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+    if (days > 0) {
+      return `${days}d ${hours}h ${minutes}m`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m ${seconds}s`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${seconds}s`;
+    } else {
+      return `${seconds}s`;
+    }
   };
 
   const initializeCanvas = (resetPixelOrder: boolean = false) => {
@@ -185,27 +195,47 @@ export default function PixelTimer({
     if (fillMode === "solid") {
       const shadesPerMs = 255 / totalDuration;
       const shadesPerSecond = shadesPerMs * 1000;
+      const shadesPerMinute = shadesPerSecond * 60;
+      const shadesPerHour = shadesPerMinute * 60;
+      const shadesPerDay = shadesPerHour * 24;
+      
       if (shadesPerSecond >= 1) {
         setRate(`${shadesPerSecond.toFixed(1)} shades/second`);
+      } else if (shadesPerMinute >= 1) {
+        setRate(`${shadesPerMinute.toFixed(1)} shades/minute`);
+      } else if (shadesPerHour >= 1) {
+        setRate(`${shadesPerHour.toFixed(1)} shades/hour`);
+      } else if (shadesPerDay >= 1) {
+        setRate(`${shadesPerDay.toFixed(1)} shades/day`);
       } else {
-        const secondsPerShade = 1 / shadesPerSecond;
-        if (secondsPerShade < 1) {
-          setRate(`1 shade/${(secondsPerShade * 1000).toFixed(0)} milliseconds`);
+        const daysPerShade = 1 / shadesPerDay;
+        if (daysPerShade < 365) {
+          setRate(`1 shade/${daysPerShade.toFixed(1)} days`);
         } else {
-          setRate(`1 shade/${secondsPerShade.toFixed(2)} seconds`);
+          setRate(`1 shade/${(daysPerShade / 365).toFixed(1)} years`);
         }
       }
     } else {
       const pixelsPerMs = totalPixels / totalDuration;
       const pixelsPerSecond = pixelsPerMs * 1000;
+      const pixelsPerMinute = pixelsPerSecond * 60;
+      const pixelsPerHour = pixelsPerMinute * 60;
+      const pixelsPerDay = pixelsPerHour * 24;
+      
       if (pixelsPerSecond >= 1) {
         setRate(`${pixelsPerSecond.toFixed(1)} pixels/second`);
+      } else if (pixelsPerMinute >= 1) {
+        setRate(`${pixelsPerMinute.toFixed(1)} pixels/minute`);
+      } else if (pixelsPerHour >= 1) {
+        setRate(`${pixelsPerHour.toFixed(1)} pixels/hour`);
+      } else if (pixelsPerDay >= 1) {
+        setRate(`${pixelsPerDay.toFixed(1)} pixels/day`);
       } else {
-        const secondsPerPixel = 1 / pixelsPerSecond;
-        if (secondsPerPixel < 1) {
-          setRate(`1 pixel/${(secondsPerPixel * 1000).toFixed(0)} milliseconds`);
+        const daysPerPixel = 1 / pixelsPerDay;
+        if (daysPerPixel < 365) {
+          setRate(`1 pixel/${daysPerPixel.toFixed(1)} days`);
         } else {
-          setRate(`1 pixel/${secondsPerPixel.toFixed(2)} seconds`);
+          setRate(`1 pixel/${(daysPerPixel / 365).toFixed(1)} years`);
         }
       }
     }
