@@ -258,8 +258,6 @@ export default function DashboardPage() {
       <Navigation />
 
       <main className="max-w-7xl mx-auto px-4 py-12">
-
-      <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-white mb-2">My Dashboard</h1>
           <p className="text-slate-400">
