@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Navigation from "@/app/components/Navigation";
+import { DashboardSkeletonList } from "@/app/components/Skeletons";
 import PixelTimerThumbnail from "@/app/components/PixelTimerThumbnail";
 
 interface Timer {
@@ -234,30 +236,28 @@ export default function DashboardPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900">
+        <Navigation />
+        <main className="max-w-7xl mx-auto px-4 py-12">
+          <div className="mb-12 animate-pulse">
+            <div className="h-10 bg-slate-700 rounded w-1/3 mb-4"></div>
+            <div className="flex gap-6 mb-8">
+              <div className="h-16 bg-slate-700 rounded w-32"></div>
+              <div className="h-16 bg-slate-700 rounded w-32"></div>
+              <div className="h-16 bg-slate-700 rounded w-32"></div>
+            </div>
+          </div>
+          <DashboardSkeletonList />
+        </main>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            PixelCount
-          </Link>
-          <div className="flex gap-4 items-center">
-            <Link href="/gallery" className="text-slate-300 hover:text-white transition">
-              Gallery
-            </Link>
-            <Link href="/create" className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition">
-              Create Timer
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
+
+      <main className="max-w-7xl mx-auto px-4 py-12">
 
       <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="mb-12">

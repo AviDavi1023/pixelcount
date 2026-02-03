@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Navigation from "@/app/components/Navigation";
 
 export default function CreatePage() {
   const router = useRouter();
@@ -203,17 +204,7 @@ export default function CreatePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900">
-      {/* Navigation */}
-      <nav className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            PixelCount
-          </Link>
-          <Link href="/" className="text-slate-300 hover:text-white transition">
-            ← Back to Home
-          </Link>
-        </div>
-      </nav>
+      <Navigation />
 
       <main className="max-w-2xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-white mb-2">Create Timer</h1>

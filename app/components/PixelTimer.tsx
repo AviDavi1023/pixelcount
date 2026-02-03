@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Confetti from "./Confetti";
 
 interface PixelTimerProps {
   startTime: Date;
@@ -28,6 +29,7 @@ export default function PixelTimer({
   const [rate, setRate] = useState("");
   const [isPaused, setIsPaused] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const pixelOrderRef = useRef<Uint32Array | undefined>(undefined);
   const imageDataRef = useRef<ImageData | undefined>(undefined);
@@ -44,45 +46,35 @@ export default function PixelTimer({
     initializeCanvas(true);
     
     const handleResize = () => {
-      console.log('RESIZE EVENT FIRED');
-      // On resize, just reinitialize the canvas without resetting pixel order
-      // The progress will be recalculated from elapsed time, not from pixels
+      // On resize, regenerate pixel order but preserve progress based on elapsed time
       const canvas = canvasRef.current;
       if (canvas) {
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
         if (ctx) {
+          // Get current progress before resizing
+          const now = Date.now();
+          const start = startTime.getTime();
+          const end = endTime.getTime();
+          const currentProgress = Math.min(1, Math.max(0, (now - start) / (end - start)));
+          
+          // Update canvas dimensions
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
           
-          // Reset canvas to start color
-          const startRGB = hexToRGB(startColor);
-          ctx.fillStyle = startColor;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          // Reinitialize with new dimensions
+          initializeCanvas(true);
           
-          // Reset image data with new dimensions
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const data = imageData.data;
-          
-          for (let i = 0; i < data.length; i += 4) {
-            data[i] = startRGB.r;
-            data[i + 1] = startRGB.g;
-            data[i + 2] = startRGB.b;
-            data[i + 3] = 255;
-          }
-          
-          ctx.putImageData(imageData, 0, 0);
-          imageDataRef.current = imageData;
-          
-          // Reset filled pixels counter - progress will be recalculated from time
-          filledPixelsRef.current = 0;
-          console.log('Canvas resized to:', canvas.width, 'x', canvas.height);
+          // Restore progress based on elapsed time, not pixels
+          const totalPixels = canvas.width * canvas.height;
+          const targetPixels = Math.floor(currentProgress * totalPixels);
+          filledPixelsRef.current = targetPixels;
         }
       }
     };
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [startTime, endTime]);
 
   const interpolateColor = (start: ReturnType<typeof hexToRGB>, end: ReturnType<typeof hexToRGB>, ratio: number) => {
     return {
@@ -235,6 +227,33 @@ export default function PixelTimer({
       currentProgress = 1;
       remainingMs = 0;
       setIsComplete(true);
+      setShowConfetti(true);
+      
+      // Play completion sound effect
+      try {
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        const now = audioContext.currentTime;
+        
+        // Create a pleasant "ding" sound
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        // Quick ascending tones for "celebration" feel
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.setValueAtTime(1000, now + 0.1);
+        osc.frequency.setValueAtTime(1200, now + 0.2);
+        
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        
+        osc.start(now);
+        osc.stop(now + 0.5);
+      } catch (e) {
+        // Audio context not available, silent fail
+      }
     } else if (now <= start) {
       currentProgress = 0;
       remainingMs = end - start;
@@ -349,19 +368,22 @@ export default function PixelTimer({
     <div className="fixed inset-0">
       <canvas ref={canvasRef} className="absolute inset-0" />
 
+      {/* Confetti Effect */}
+      {showConfetti && <Confetti />}
+
       {/* Title Display */}
       {title && !isComplete && (
-        <div className="fixed top-12 left-1/2 -translate-x-1/2 z-20 px-10 py-5 rounded-2xl bg-black/75 backdrop-blur-xl border border-white/20">
-          <h1 className="text-3xl font-bold text-white text-center">{title}</h1>
+        <div className="fixed top-8 md:top-12 left-1/2 -translate-x-1/2 z-20 px-6 md:px-10 py-3 md:py-5 rounded-xl md:rounded-2xl bg-black/75 backdrop-blur-xl border border-white/20 max-w-[90vw] md:max-w-none">
+          <h1 className="text-lg md:text-3xl font-bold text-white text-center line-clamp-1">{title}</h1>
         </div>
       )}
 
       {/* Progress Display */}
       {showControls && !isComplete && (
-        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-20 bg-black/75 backdrop-blur-xl px-12 py-6 rounded-3xl border border-white/20">
+        <div className="fixed bottom-6 md:bottom-12 left-1/2 -translate-x-1/2 z-20 bg-black/75 backdrop-blur-xl px-6 md:px-12 py-4 md:py-6 rounded-2xl md:rounded-3xl border border-white/20">
           <div className="text-center">
-            <div className="text-5xl font-bold text-white mb-2">{progress.toFixed(2)}%</div>
-            <div className="text-sm text-white/60 font-medium">{timeRemaining} remaining</div>
+            <div className="text-3xl md:text-5xl font-bold text-white mb-1 md:mb-2">{progress.toFixed(2)}%</div>
+            <div className="text-xs md:text-sm text-white/60 font-medium">{timeRemaining} remaining</div>
             <div className="text-xs text-white/50 font-medium mt-1">{rate}</div>
           </div>
         </div>
@@ -369,11 +391,22 @@ export default function PixelTimer({
 
       {/* Completion Message */}
       {isComplete && (
-        <div className="fixed inset-0 flex items-center justify-center z-20 bg-black/50 backdrop-blur-sm">
-          <div className="bg-black/90 backdrop-blur-xl px-16 py-12 rounded-3xl border border-white/20">
+        <div className="fixed inset-0 flex items-center justify-center z-30 bg-black/50 backdrop-blur-sm p-4">
+          <div className="animate-in zoom-in duration-500 bg-gradient-to-br from-black/90 to-black/80 backdrop-blur-xl px-8 md:px-16 py-8 md:py-12 rounded-2xl md:rounded-3xl border border-white/20 shadow-2xl max-w-sm w-full">
             <div className="text-center">
-              <div className="text-6xl font-bold text-white mb-4">100.00%</div>
-              <div className="text-2xl text-white/80 font-medium">Complete! 🎉</div>
+              <div className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 md:mb-4">
+                100%
+              </div>
+              <div className="text-2xl md:text-3xl font-bold text-white mb-2">Complete! 🎉</div>
+              <div className="text-xs md:text-sm text-white/60 mb-6 md:mb-8">Timer finished successfully</div>
+              <div className="flex flex-col md:flex-row gap-3 justify-center">
+                <button className="px-4 md:px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-semibold transition text-sm md:text-base">
+                  Share
+                </button>
+                <button className="px-4 md:px-6 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-white font-semibold transition text-sm md:text-base">
+                  Duplicate
+                </button>
+              </div>
             </div>
           </div>
         </div>

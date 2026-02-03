@@ -256,10 +256,10 @@ export default function TimerViewPage() {
       {!isFullscreen && (
         <Link
           href="/gallery"
-          className="fixed top-8 left-8 z-30 p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
+          className="fixed top-6 left-6 md:top-8 md:left-8 z-30 p-3 md:p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition active:scale-95"
           title="Back to Gallery"
         >
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
         </Link>
@@ -267,10 +267,10 @@ export default function TimerViewPage() {
 
       {/* Floating Action Buttons */}
       {!isFullscreen && (
-        <div className="fixed top-8 right-8 z-30 flex flex-col gap-3">
+        <div className="fixed top-6 right-6 md:top-8 md:right-8 z-30 flex flex-col gap-2 md:gap-3">
           <button
             onClick={toggleLike}
-            className={`p-4 backdrop-blur-xl rounded-full border transition ${
+            className={`p-3 md:p-4 backdrop-blur-xl rounded-full border transition active:scale-95 ${
               isLiked
                 ? "bg-red-500/80 border-red-400/50 hover:bg-red-600/80"
                 : "bg-black/75 border-white/20 hover:bg-black/90"
@@ -279,7 +279,7 @@ export default function TimerViewPage() {
           >
             <div className="flex flex-col items-center gap-1">
               <svg
-                className="w-6 h-6 text-white"
+                className="w-5 h-5 md:w-6 md:h-6 text-white"
                 fill={isLiked ? "currentColor" : "none"}
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -291,26 +291,26 @@ export default function TimerViewPage() {
                   d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
                 />
               </svg>
-              <span className="text-xs text-white font-medium">{likeCount}</span>
+              <span className="text-xs text-white font-medium hidden md:block">{likeCount}</span>
             </div>
           </button>
 
           <button
             onClick={() => setShowCustomization(!showCustomization)}
-            className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
+            className="p-3 md:p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition active:scale-95"
             title="Customize"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>
           </button>
 
           <button
             onClick={toggleFullscreen}
-            className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
+            className="p-3 md:p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition active:scale-95"
             title="Toggle Fullscreen"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               {isFullscreen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
@@ -321,10 +321,10 @@ export default function TimerViewPage() {
 
           <button
             onClick={() => setShowShareMenu(!showShareMenu)}
-            className="p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition"
+            className="p-3 md:p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-black/90 transition active:scale-95"
             title="Share"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
           </button>
@@ -333,7 +333,7 @@ export default function TimerViewPage() {
 
       {/* Customization Panel */}
       {showCustomization && (
-        <div className="fixed top-24 right-8 z-40 w-80 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
+        <div className="fixed top-24 right-6 md:right-8 z-40 w-80 max-w-[calc(100vw-48px)] md:max-w-none bg-black/90 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-white font-bold">Customize View</h3>
             <button
@@ -355,7 +355,7 @@ export default function TimerViewPage() {
                 type="color"
                 value={customStartColor}
                 onChange={(e) => setCustomStartColor(e.target.value)}
-                className="w-full h-10 rounded-lg cursor-pointer"
+                className="w-full h-12 rounded-lg cursor-pointer"
               />
             </div>
 
@@ -365,7 +365,7 @@ export default function TimerViewPage() {
                 type="color"
                 value={customEndColor}
                 onChange={(e) => setCustomEndColor(e.target.value)}
-                className="w-full h-10 rounded-lg cursor-pointer"
+                className="w-full h-12 rounded-lg cursor-pointer"
               />
             </div>
 
@@ -376,7 +376,7 @@ export default function TimerViewPage() {
                   <button
                     key={mode}
                     onClick={() => setCustomFillMode(mode)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium capitalize transition ${
+                    className={`px-3 py-2 rounded-lg text-sm font-medium capitalize transition active:scale-95 ${
                       customFillMode === mode
                         ? "bg-purple-600 text-white"
                         : "bg-slate-700 text-slate-300 hover:bg-slate-600"
@@ -394,7 +394,7 @@ export default function TimerViewPage() {
                 setCustomEndColor(timer.endColor);
                 setCustomFillMode(timer.fillMode as any);
               }}
-              className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm"
+              className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition text-sm active:scale-95"
             >
               Reset to Original
             </button>

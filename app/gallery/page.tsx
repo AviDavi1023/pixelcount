@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import Navigation from "@/app/components/Navigation";
+import { GallerySkeletonGrid } from "@/app/components/Skeletons";
 import PixelTimerThumbnail from "@/app/components/PixelTimerThumbnail";
 
 interface Timer {
@@ -27,7 +28,6 @@ interface Timer {
 }
 
 export default function GalleryPage() {
-  const { data: session } = useSession();
   const [timers, setTimers] = useState<Timer[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -102,28 +102,7 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            PixelCount
-          </Link>
-          <div className="flex gap-4 items-center">
-            <Link href="/create" className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition">
-              Create Timer
-            </Link>
-            {session ? (
-              <Link href="/dashboard" className="text-slate-300 hover:text-white transition">
-                Dashboard
-              </Link>
-            ) : (
-              <Link href="/login" className="text-slate-300 hover:text-white transition">
-                Sign In
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="mb-12">
@@ -159,7 +138,7 @@ export default function GalleryPage() {
 
         {/* Timers Grid */}
         {loading ? (
-          <div className="text-center text-slate-400 py-12">Loading timers...</div>
+          <GallerySkeletonGrid />
         ) : timers.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-slate-400 mb-4">No timers found</p>
