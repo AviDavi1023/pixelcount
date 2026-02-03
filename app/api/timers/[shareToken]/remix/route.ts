@@ -5,9 +5,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { shareToken: string } }
+  { params }: { params: Promise<{ shareToken: string }> }
 ) {
   try {
+    const { shareToken } = await params;
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -19,7 +20,7 @@ export async function POST(
 
     // Get the original timer
     const originalTimer = await prisma.timer.findUnique({
-      where: { shareToken: params.shareToken },
+      where: { shareToken },
       include: { user: true },
     });
 
