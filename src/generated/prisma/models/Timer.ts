@@ -29,11 +29,13 @@ export type AggregateTimer = {
 export type TimerAvgAggregateOutputType = {
   duration: number | null
   viewCount: number | null
+  remixCount: number | null
 }
 
 export type TimerSumAggregateOutputType = {
   duration: number | null
   viewCount: number | null
+  remixCount: number | null
 }
 
 export type TimerMinAggregateOutputType = {
@@ -51,11 +53,14 @@ export type TimerMinAggregateOutputType = {
   isRecurring: boolean | null
   recurrenceType: string | null
   lastReset: Date | null
+  category: string | null
+  remixedFromId: string | null
   isPublic: boolean | null
   shareToken: string | null
   createdAt: Date | null
   updatedAt: Date | null
   viewCount: number | null
+  remixCount: number | null
 }
 
 export type TimerMaxAggregateOutputType = {
@@ -73,11 +78,14 @@ export type TimerMaxAggregateOutputType = {
   isRecurring: boolean | null
   recurrenceType: string | null
   lastReset: Date | null
+  category: string | null
+  remixedFromId: string | null
   isPublic: boolean | null
   shareToken: string | null
   createdAt: Date | null
   updatedAt: Date | null
   viewCount: number | null
+  remixCount: number | null
 }
 
 export type TimerCountAggregateOutputType = {
@@ -95,11 +103,14 @@ export type TimerCountAggregateOutputType = {
   isRecurring: number
   recurrenceType: number
   lastReset: number
+  category: number
+  remixedFromId: number
   isPublic: number
   shareToken: number
   createdAt: number
   updatedAt: number
   viewCount: number
+  remixCount: number
   _all: number
 }
 
@@ -107,11 +118,13 @@ export type TimerCountAggregateOutputType = {
 export type TimerAvgAggregateInputType = {
   duration?: true
   viewCount?: true
+  remixCount?: true
 }
 
 export type TimerSumAggregateInputType = {
   duration?: true
   viewCount?: true
+  remixCount?: true
 }
 
 export type TimerMinAggregateInputType = {
@@ -129,11 +142,14 @@ export type TimerMinAggregateInputType = {
   isRecurring?: true
   recurrenceType?: true
   lastReset?: true
+  category?: true
+  remixedFromId?: true
   isPublic?: true
   shareToken?: true
   createdAt?: true
   updatedAt?: true
   viewCount?: true
+  remixCount?: true
 }
 
 export type TimerMaxAggregateInputType = {
@@ -151,11 +167,14 @@ export type TimerMaxAggregateInputType = {
   isRecurring?: true
   recurrenceType?: true
   lastReset?: true
+  category?: true
+  remixedFromId?: true
   isPublic?: true
   shareToken?: true
   createdAt?: true
   updatedAt?: true
   viewCount?: true
+  remixCount?: true
 }
 
 export type TimerCountAggregateInputType = {
@@ -173,11 +192,14 @@ export type TimerCountAggregateInputType = {
   isRecurring?: true
   recurrenceType?: true
   lastReset?: true
+  category?: true
+  remixedFromId?: true
   isPublic?: true
   shareToken?: true
   createdAt?: true
   updatedAt?: true
   viewCount?: true
+  remixCount?: true
   _all?: true
 }
 
@@ -282,11 +304,14 @@ export type TimerGroupByOutputType = {
   isRecurring: boolean
   recurrenceType: string | null
   lastReset: Date | null
+  category: string
+  remixedFromId: string | null
   isPublic: boolean
   shareToken: string
   createdAt: Date
   updatedAt: Date
   viewCount: number
+  remixCount: number
   _count: TimerCountAggregateOutputType | null
   _avg: TimerAvgAggregateOutputType | null
   _sum: TimerSumAggregateOutputType | null
@@ -327,11 +352,14 @@ export type TimerWhereInput = {
   isRecurring?: Prisma.BoolFilter<"Timer"> | boolean
   recurrenceType?: Prisma.StringNullableFilter<"Timer"> | string | null
   lastReset?: Prisma.DateTimeNullableFilter<"Timer"> | Date | string | null
+  category?: Prisma.StringFilter<"Timer"> | string
+  remixedFromId?: Prisma.StringNullableFilter<"Timer"> | string | null
   isPublic?: Prisma.BoolFilter<"Timer"> | boolean
   shareToken?: Prisma.StringFilter<"Timer"> | string
   createdAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
   viewCount?: Prisma.IntFilter<"Timer"> | number
+  remixCount?: Prisma.IntFilter<"Timer"> | number
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   likes?: Prisma.LikeListRelationFilter
 }
@@ -351,11 +379,14 @@ export type TimerOrderByWithRelationInput = {
   isRecurring?: Prisma.SortOrder
   recurrenceType?: Prisma.SortOrderInput | Prisma.SortOrder
   lastReset?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrder
+  remixedFromId?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
+  remixCount?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   likes?: Prisma.LikeOrderByRelationAggregateInput
 }
@@ -379,10 +410,13 @@ export type TimerWhereUniqueInput = Prisma.AtLeast<{
   isRecurring?: Prisma.BoolFilter<"Timer"> | boolean
   recurrenceType?: Prisma.StringNullableFilter<"Timer"> | string | null
   lastReset?: Prisma.DateTimeNullableFilter<"Timer"> | Date | string | null
+  category?: Prisma.StringFilter<"Timer"> | string
+  remixedFromId?: Prisma.StringNullableFilter<"Timer"> | string | null
   isPublic?: Prisma.BoolFilter<"Timer"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
   viewCount?: Prisma.IntFilter<"Timer"> | number
+  remixCount?: Prisma.IntFilter<"Timer"> | number
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   likes?: Prisma.LikeListRelationFilter
 }, "id" | "shareToken">
@@ -402,11 +436,14 @@ export type TimerOrderByWithAggregationInput = {
   isRecurring?: Prisma.SortOrder
   recurrenceType?: Prisma.SortOrderInput | Prisma.SortOrder
   lastReset?: Prisma.SortOrderInput | Prisma.SortOrder
+  category?: Prisma.SortOrder
+  remixedFromId?: Prisma.SortOrderInput | Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
+  remixCount?: Prisma.SortOrder
   _count?: Prisma.TimerCountOrderByAggregateInput
   _avg?: Prisma.TimerAvgOrderByAggregateInput
   _max?: Prisma.TimerMaxOrderByAggregateInput
@@ -432,11 +469,14 @@ export type TimerScalarWhereWithAggregatesInput = {
   isRecurring?: Prisma.BoolWithAggregatesFilter<"Timer"> | boolean
   recurrenceType?: Prisma.StringNullableWithAggregatesFilter<"Timer"> | string | null
   lastReset?: Prisma.DateTimeNullableWithAggregatesFilter<"Timer"> | Date | string | null
+  category?: Prisma.StringWithAggregatesFilter<"Timer"> | string
+  remixedFromId?: Prisma.StringNullableWithAggregatesFilter<"Timer"> | string | null
   isPublic?: Prisma.BoolWithAggregatesFilter<"Timer"> | boolean
   shareToken?: Prisma.StringWithAggregatesFilter<"Timer"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Timer"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Timer"> | Date | string
   viewCount?: Prisma.IntWithAggregatesFilter<"Timer"> | number
+  remixCount?: Prisma.IntWithAggregatesFilter<"Timer"> | number
 }
 
 export type TimerCreateInput = {
@@ -453,11 +493,14 @@ export type TimerCreateInput = {
   isRecurring?: boolean
   recurrenceType?: string | null
   lastReset?: Date | string | null
+  category?: string
+  remixedFromId?: string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   viewCount?: number
+  remixCount?: number
   user?: Prisma.UserCreateNestedOneWithoutTimersInput
   likes?: Prisma.LikeCreateNestedManyWithoutTimerInput
 }
@@ -477,11 +520,14 @@ export type TimerUncheckedCreateInput = {
   isRecurring?: boolean
   recurrenceType?: string | null
   lastReset?: Date | string | null
+  category?: string
+  remixedFromId?: string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   viewCount?: number
+  remixCount?: number
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutTimerInput
 }
 
@@ -499,11 +545,14 @@ export type TimerUpdateInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneWithoutTimersNestedInput
   likes?: Prisma.LikeUpdateManyWithoutTimerNestedInput
 }
@@ -523,11 +572,14 @@ export type TimerUncheckedUpdateInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
   likes?: Prisma.LikeUncheckedUpdateManyWithoutTimerNestedInput
 }
 
@@ -546,11 +598,14 @@ export type TimerCreateManyInput = {
   isRecurring?: boolean
   recurrenceType?: string | null
   lastReset?: Date | string | null
+  category?: string
+  remixedFromId?: string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   viewCount?: number
+  remixCount?: number
 }
 
 export type TimerUpdateManyMutationInput = {
@@ -567,11 +622,14 @@ export type TimerUpdateManyMutationInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type TimerUncheckedUpdateManyInput = {
@@ -589,11 +647,14 @@ export type TimerUncheckedUpdateManyInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type TimerListRelationFilter = {
@@ -621,16 +682,20 @@ export type TimerCountOrderByAggregateInput = {
   isRecurring?: Prisma.SortOrder
   recurrenceType?: Prisma.SortOrder
   lastReset?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  remixedFromId?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
+  remixCount?: Prisma.SortOrder
 }
 
 export type TimerAvgOrderByAggregateInput = {
   duration?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
+  remixCount?: Prisma.SortOrder
 }
 
 export type TimerMaxOrderByAggregateInput = {
@@ -648,11 +713,14 @@ export type TimerMaxOrderByAggregateInput = {
   isRecurring?: Prisma.SortOrder
   recurrenceType?: Prisma.SortOrder
   lastReset?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  remixedFromId?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
+  remixCount?: Prisma.SortOrder
 }
 
 export type TimerMinOrderByAggregateInput = {
@@ -670,16 +738,20 @@ export type TimerMinOrderByAggregateInput = {
   isRecurring?: Prisma.SortOrder
   recurrenceType?: Prisma.SortOrder
   lastReset?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  remixedFromId?: Prisma.SortOrder
   isPublic?: Prisma.SortOrder
   shareToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
+  remixCount?: Prisma.SortOrder
 }
 
 export type TimerSumOrderByAggregateInput = {
   duration?: Prisma.SortOrder
   viewCount?: Prisma.SortOrder
+  remixCount?: Prisma.SortOrder
 }
 
 export type TimerScalarRelationFilter = {
@@ -769,11 +841,14 @@ export type TimerCreateWithoutUserInput = {
   isRecurring?: boolean
   recurrenceType?: string | null
   lastReset?: Date | string | null
+  category?: string
+  remixedFromId?: string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   viewCount?: number
+  remixCount?: number
   likes?: Prisma.LikeCreateNestedManyWithoutTimerInput
 }
 
@@ -791,11 +866,14 @@ export type TimerUncheckedCreateWithoutUserInput = {
   isRecurring?: boolean
   recurrenceType?: string | null
   lastReset?: Date | string | null
+  category?: string
+  remixedFromId?: string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   viewCount?: number
+  remixCount?: number
   likes?: Prisma.LikeUncheckedCreateNestedManyWithoutTimerInput
 }
 
@@ -843,11 +921,14 @@ export type TimerScalarWhereInput = {
   isRecurring?: Prisma.BoolFilter<"Timer"> | boolean
   recurrenceType?: Prisma.StringNullableFilter<"Timer"> | string | null
   lastReset?: Prisma.DateTimeNullableFilter<"Timer"> | Date | string | null
+  category?: Prisma.StringFilter<"Timer"> | string
+  remixedFromId?: Prisma.StringNullableFilter<"Timer"> | string | null
   isPublic?: Prisma.BoolFilter<"Timer"> | boolean
   shareToken?: Prisma.StringFilter<"Timer"> | string
   createdAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Timer"> | Date | string
   viewCount?: Prisma.IntFilter<"Timer"> | number
+  remixCount?: Prisma.IntFilter<"Timer"> | number
 }
 
 export type TimerCreateWithoutLikesInput = {
@@ -864,11 +945,14 @@ export type TimerCreateWithoutLikesInput = {
   isRecurring?: boolean
   recurrenceType?: string | null
   lastReset?: Date | string | null
+  category?: string
+  remixedFromId?: string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   viewCount?: number
+  remixCount?: number
   user?: Prisma.UserCreateNestedOneWithoutTimersInput
 }
 
@@ -887,11 +971,14 @@ export type TimerUncheckedCreateWithoutLikesInput = {
   isRecurring?: boolean
   recurrenceType?: string | null
   lastReset?: Date | string | null
+  category?: string
+  remixedFromId?: string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   viewCount?: number
+  remixCount?: number
 }
 
 export type TimerCreateOrConnectWithoutLikesInput = {
@@ -924,11 +1011,14 @@ export type TimerUpdateWithoutLikesInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneWithoutTimersNestedInput
 }
 
@@ -947,11 +1037,14 @@ export type TimerUncheckedUpdateWithoutLikesInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type TimerCreateManyUserInput = {
@@ -968,11 +1061,14 @@ export type TimerCreateManyUserInput = {
   isRecurring?: boolean
   recurrenceType?: string | null
   lastReset?: Date | string | null
+  category?: string
+  remixedFromId?: string | null
   isPublic?: boolean
   shareToken?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   viewCount?: number
+  remixCount?: number
 }
 
 export type TimerUpdateWithoutUserInput = {
@@ -989,11 +1085,14 @@ export type TimerUpdateWithoutUserInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
   likes?: Prisma.LikeUpdateManyWithoutTimerNestedInput
 }
 
@@ -1011,11 +1110,14 @@ export type TimerUncheckedUpdateWithoutUserInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
   likes?: Prisma.LikeUncheckedUpdateManyWithoutTimerNestedInput
 }
 
@@ -1033,11 +1135,14 @@ export type TimerUncheckedUpdateManyWithoutUserInput = {
   isRecurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   recurrenceType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastReset?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  remixedFromId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   shareToken?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   viewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  remixCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -1086,11 +1191,14 @@ export type TimerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   isRecurring?: boolean
   recurrenceType?: boolean
   lastReset?: boolean
+  category?: boolean
+  remixedFromId?: boolean
   isPublic?: boolean
   shareToken?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   viewCount?: boolean
+  remixCount?: boolean
   user?: boolean | Prisma.Timer$userArgs<ExtArgs>
   likes?: boolean | Prisma.Timer$likesArgs<ExtArgs>
   _count?: boolean | Prisma.TimerCountOutputTypeDefaultArgs<ExtArgs>
@@ -1111,11 +1219,14 @@ export type TimerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isRecurring?: boolean
   recurrenceType?: boolean
   lastReset?: boolean
+  category?: boolean
+  remixedFromId?: boolean
   isPublic?: boolean
   shareToken?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   viewCount?: boolean
+  remixCount?: boolean
   user?: boolean | Prisma.Timer$userArgs<ExtArgs>
 }, ExtArgs["result"]["timer"]>
 
@@ -1134,11 +1245,14 @@ export type TimerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   isRecurring?: boolean
   recurrenceType?: boolean
   lastReset?: boolean
+  category?: boolean
+  remixedFromId?: boolean
   isPublic?: boolean
   shareToken?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   viewCount?: boolean
+  remixCount?: boolean
   user?: boolean | Prisma.Timer$userArgs<ExtArgs>
 }, ExtArgs["result"]["timer"]>
 
@@ -1157,14 +1271,17 @@ export type TimerSelectScalar = {
   isRecurring?: boolean
   recurrenceType?: boolean
   lastReset?: boolean
+  category?: boolean
+  remixedFromId?: boolean
   isPublic?: boolean
   shareToken?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   viewCount?: boolean
+  remixCount?: boolean
 }
 
-export type TimerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "userId" | "timerMode" | "duration" | "startTime" | "endTime" | "fillMode" | "startColor" | "endColor" | "isRecurring" | "recurrenceType" | "lastReset" | "isPublic" | "shareToken" | "createdAt" | "updatedAt" | "viewCount", ExtArgs["result"]["timer"]>
+export type TimerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "userId" | "timerMode" | "duration" | "startTime" | "endTime" | "fillMode" | "startColor" | "endColor" | "isRecurring" | "recurrenceType" | "lastReset" | "category" | "remixedFromId" | "isPublic" | "shareToken" | "createdAt" | "updatedAt" | "viewCount" | "remixCount", ExtArgs["result"]["timer"]>
 export type TimerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.Timer$userArgs<ExtArgs>
   likes?: boolean | Prisma.Timer$likesArgs<ExtArgs>
@@ -1198,11 +1315,14 @@ export type $TimerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     isRecurring: boolean
     recurrenceType: string | null
     lastReset: Date | null
+    category: string
+    remixedFromId: string | null
     isPublic: boolean
     shareToken: string
     createdAt: Date
     updatedAt: Date
     viewCount: number
+    remixCount: number
   }, ExtArgs["result"]["timer"]>
   composites: {}
 }
@@ -1642,11 +1762,14 @@ export interface TimerFieldRefs {
   readonly isRecurring: Prisma.FieldRef<"Timer", 'Boolean'>
   readonly recurrenceType: Prisma.FieldRef<"Timer", 'String'>
   readonly lastReset: Prisma.FieldRef<"Timer", 'DateTime'>
+  readonly category: Prisma.FieldRef<"Timer", 'String'>
+  readonly remixedFromId: Prisma.FieldRef<"Timer", 'String'>
   readonly isPublic: Prisma.FieldRef<"Timer", 'Boolean'>
   readonly shareToken: Prisma.FieldRef<"Timer", 'String'>
   readonly createdAt: Prisma.FieldRef<"Timer", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Timer", 'DateTime'>
   readonly viewCount: Prisma.FieldRef<"Timer", 'Int'>
+  readonly remixCount: Prisma.FieldRef<"Timer", 'Int'>
 }
     
 

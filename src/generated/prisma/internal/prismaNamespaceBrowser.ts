@@ -106,6 +106,7 @@ export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeo
 export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  username: 'username',
   email: 'email',
   emailVerified: 'emailVerified',
   image: 'image',
@@ -132,11 +133,14 @@ export const TimerScalarFieldEnum = {
   isRecurring: 'isRecurring',
   recurrenceType: 'recurrenceType',
   lastReset: 'lastReset',
+  category: 'category',
+  remixedFromId: 'remixedFromId',
   isPublic: 'isPublic',
   shareToken: 'shareToken',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  viewCount: 'viewCount'
+  viewCount: 'viewCount',
+  remixCount: 'remixCount'
 } as const
 
 export type TimerScalarFieldEnum = (typeof TimerScalarFieldEnum)[keyof typeof TimerScalarFieldEnum]

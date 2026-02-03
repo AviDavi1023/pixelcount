@@ -179,6 +179,28 @@ export default function TimerViewPage() {
     }
   };
 
+  const handleRemix = async () => {
+    try {
+      const response = await fetch(`/api/timers/${shareToken}/remix`, {
+        method: "POST",
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        // Redirect to edit page for the remixed timer
+        window.location.href = `/edit/${data.shareToken}`;
+      } else if (response.status === 401) {
+        // Redirect to login if not authenticated
+        window.location.href = `/login?redirect=/timer/${shareToken}`;
+      } else {
+        alert("Failed to remix timer");
+      }
+    } catch (error) {
+      console.error("Error remixing timer:", error);
+      alert("Failed to remix timer");
+    }
+  };
+
   const copyShareLink = () => {
     const url = window.location.origin + window.location.pathname;
     navigator.clipboard.writeText(url);
@@ -293,6 +315,16 @@ export default function TimerViewPage() {
               </svg>
               <span className="text-xs text-white font-medium hidden md:block">{likeCount}</span>
             </div>
+          </button>
+
+          <button
+            onClick={handleRemix}
+            className="p-3 md:p-4 bg-black/75 backdrop-blur-xl rounded-full border border-white/20 hover:bg-purple-500/80 hover:border-purple-400/50 transition active:scale-95"
+            title="Remix this timer"
+          >
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
           </button>
 
           <button

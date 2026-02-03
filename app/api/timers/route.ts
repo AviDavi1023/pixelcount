@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
     const sortBy = searchParams.get("sortBy") || "createdAt";
+    const category = searchParams.get("category");
     const userId = searchParams.get("userId");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "50");
@@ -28,6 +29,10 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    if (category && category !== "all") {
+      where.category = category;
+    }
+
     const [timers, totalCount] = await Promise.all([
       prisma.timer.findMany({
         where,
@@ -42,7 +47,9 @@ export async function GET(request: NextRequest) {
             select: {
               id: true,
               name: true,
+              username: true,
               email: true,
+              image: true,
             },
           },
           _count: {
@@ -62,18 +69,17 @@ export async function GET(request: NextRequest) {
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
     const filteredTimers = timers.filter(timer => {
       const endTime = new Date(timer.endTime);
-      // Keep if not completed or completed less than 1 hour ago
       return endTime > oneHourAgo;
     });
 
-    // Sort: pin example timers to top, then by requested sort
+    // Sort: pin example timers to top
     const sortedTimers = filteredTimers.sort((a, b) => {
       const aIsExample = a.shareToken.includes('example') || a.shareToken.includes('countdown');
       const bIsExample = b.shareToken.includes('example') || b.shareToken.includes('countdown');
       
       if (aIsExample && !bIsExample) return -1;
       if (!aIsExample && bIsExample) return 1;
-      return 0; // Keep original order for non-examples
+      return 0;
     });
 
     const totalPages = Math.ceil(totalCount / limit);
@@ -90,7 +96,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error("Error fetching timers:", error);
-    // Return empty result with pagination on error to prevent frontend crashes
     return NextResponse.json({
       timers: [],
       pagination: { page: 1, limit: 50, totalCount: 0, totalPages: 0, hasMore: false },
@@ -114,6 +119,7 @@ export async function POST(request: NextRequest) {
       fillMode,
       startColor,
       endColor,
+      category,
       isPublic,
       isRecurring,
       recurrenceType,
@@ -136,6 +142,7 @@ export async function POST(request: NextRequest) {
         fillMode,
         startColor,
         endColor,
+        category: category || "productivity",
         isRecurring: isRecurring || false,
         recurrenceType: recurrenceType || null,
         isPublic: session?.user ? isPublic || false : false,

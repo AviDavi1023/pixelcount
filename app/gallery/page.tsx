@@ -32,19 +32,21 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
+  const [category, setCategory] = useState("all");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
     fetchTimers();
-  }, [search, sortBy, page]);
+  }, [search, sortBy, category, page]);
 
   const fetchTimers = async () => {
     try {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       params.append("sortBy", sortBy);
+      if (category !== "all") params.append("category", category);
       params.append("page", page.toString());
       params.append("limit", "12");
 
@@ -134,6 +136,26 @@ export default function GalleryPage() {
             <option value="title">Alphabetical</option>
             <option value="views">Most Viewed</option>
           </select>
+        </div>
+
+        {/* Category Tabs */}
+        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+          {["all", "productivity", "events", "sports", "holidays", "daily", "fun"].map((cat) => (
+            <button
+              key={cat}
+              onClick={() => {
+                setCategory(cat);
+                setPage(1);
+              }}
+              className={`px-4 py-2 rounded-lg font-medium transition whitespace-nowrap ${
+                category === cat
+                  ? "bg-purple-600 text-white"
+                  : "bg-slate-800/50 text-slate-300 hover:bg-slate-700/50"
+              }`}
+            >
+              {cat === "all" ? "All Categories" : cat.charAt(0).toUpperCase() + cat.slice(1)}
+            </button>
+          ))}
         </div>
 
         {/* Timers Grid */}

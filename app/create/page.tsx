@@ -23,6 +23,7 @@ export default function CreatePage() {
     fillMode: "random",
     startColor: "#ffffff",
     endColor: "#000000",
+    category: "productivity",
     isPublic: false,
     isRecurring: false,
     recurrenceType: "daily",
@@ -324,6 +325,23 @@ export default function CreatePage() {
                 Timer
               </button>
             </div>
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-semibold text-white mb-2 uppercase tracking-wide">Category</label>
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+            >
+              <option value="productivity">Productivity</option>
+              <option value="events">Events</option>
+              <option value="sports">Sports</option>
+              <option value="holidays">Holidays</option>
+              <option value="daily">Daily Life</option>
+              <option value="fun">Fun & Games</option>
+            </select>
           </div>
 
           {/* Countdown Inputs */}
