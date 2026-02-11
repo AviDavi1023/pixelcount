@@ -1,8 +1,10 @@
 import { prisma } from "@/app/lib/prisma";
+import { ensureCoreSchema } from "@/app/lib/ensure-schema";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
+    await ensureCoreSchema();
     const searchParams = req.nextUrl.searchParams;
     const sortBy = searchParams.get("sort") || "trending"; // trending, new, popular
     const category = searchParams.get("category");

@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
+import { ensureCoreSchema } from "@/app/lib/ensure-schema";
 import { getServerSession } from "next-auth";
 
 // GET /api/timers - Get all public timers or user's timers
 export async function GET(request: NextRequest) {
   try {
+    await ensureCoreSchema();
     const { searchParams } = new URL(request.url);
     const search = searchParams.get("search");
     const sortBy = searchParams.get("sortBy") || "createdAt";
@@ -106,6 +108,7 @@ export async function GET(request: NextRequest) {
 // POST /api/timers - Create a new timer
 export async function POST(request: NextRequest) {
   try {
+    await ensureCoreSchema();
     const session = await getServerSession();
     const body = await request.json();
 

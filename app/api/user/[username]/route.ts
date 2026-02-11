@@ -1,4 +1,5 @@
 import { prisma } from "@/app/lib/prisma";
+import { ensureCoreSchema } from "@/app/lib/ensure-schema";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -6,6 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ username: string }> }
 ) {
   try {
+    await ensureCoreSchema();
     const { username } = await params;
     const user = await prisma.user.findUnique({
       where: { username },

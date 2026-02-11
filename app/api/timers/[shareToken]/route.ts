@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/app/lib/prisma";
+import { ensureCoreSchema } from "@/app/lib/ensure-schema";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ shareToken: string }> }
 ) {
   try {
+    await ensureCoreSchema();
     const { shareToken } = await params;
     const session = await getServerSession(authOptions);
 
@@ -65,6 +67,7 @@ export async function DELETE(
   { params }: { params: Promise<{ shareToken: string }> }
 ) {
   try {
+    await ensureCoreSchema();
     const { shareToken } = await params;
     await prisma.timer.delete({
       where: { shareToken },
@@ -82,6 +85,7 @@ export async function PATCH(
   { params }: { params: Promise<{ shareToken: string }> }
 ) {
   try {
+    await ensureCoreSchema();
     const { shareToken } = await params;
     const body = await request.json();
     const { title, description, isPublic } = body;
