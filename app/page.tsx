@@ -69,46 +69,37 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900">
+    <div>
       <Navigation />
 
-      {/* Hero Section */}
-      <main className="max-w-6xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+      <main>
+        <h1>
           Visual Countdowns & Timers
         </h1>
         
-        <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
+        <p>
           Create stunning pixel-filling timers and countdowns. Share them with the world or keep them private. Customize colors, patterns, and modes to fit your needs.
         </p>
 
-        <div className="flex gap-4 justify-center mb-16">
-          <Link
-            href="/create"
-            className="px-8 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition transform hover:scale-105"
-          >
+        <div>
+          <Link href="/create">
             Create Timer
           </Link>
-          <Link
-            href="/gallery"
-            className="px-8 py-3 bg-slate-800 hover:bg-slate-700 rounded-lg font-semibold transition transform hover:scale-105"
-          >
+          <Link href="/gallery">
             Browse Gallery
           </Link>
         </div>
 
-        {/* Example Timers */}
         {exampleTimers.length > 0 && (
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold mb-6 text-white">Example Timers</h2>
-            <div className="grid md:grid-cols-3 gap-6">
+          <div>
+            <h2>Example Timers</h2>
+            <div>
               {exampleTimers.map((timer) => (
                 <Link
                   key={timer.id}
                   href={`/timer/${timer.shareToken}`}
-                  className="block bg-slate-800/30 border border-slate-700 rounded-xl overflow-hidden hover:border-purple-500 hover:bg-slate-800/50 transition group"
                 >
-                  <div className="h-40 bg-slate-700/50 relative overflow-hidden">
+                  <div>
                     <PixelTimerThumbnail
                       startTime={timer.startTime ? new Date(timer.startTime) : new Date(timer.endTime)}
                       endTime={new Date(timer.endTime)}
@@ -121,12 +112,12 @@ export default function Home() {
                       enableCycling={true}
                     />
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold text-white mb-1 group-hover:text-purple-400 transition">
+                  <div>
+                    <h3>
                       {timer.title}
                     </h3>
                     {timer.description && (
-                      <p className="text-slate-400 text-sm">{timer.description}</p>
+                      <p>{timer.description}</p>
                     )}
                   </div>
                 </Link>
@@ -135,24 +126,23 @@ export default function Home() {
           </div>
         )}
 
-        {/* Feature Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mt-20">
-          <div className="bg-slate-800/50 backdrop-blur p-6 rounded-xl border border-slate-700">
-            <div className="text-4xl mb-4">🎨</div>
-            <h3 className="text-xl font-semibold mb-2">Customizable</h3>
-            <p className="text-slate-400">Choose from multiple fill patterns and custom color gradients.</p>
+        <div>
+          <div>
+            <div>🎨</div>
+            <h3>Customizable</h3>
+            <p>Choose from multiple fill patterns and custom color gradients.</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur p-6 rounded-xl border border-slate-700">
-            <div className="text-4xl mb-4">🔗</div>
-            <h3 className="text-xl font-semibold mb-2">Shareable</h3>
-            <p className="text-slate-400">Share timers via link, embed them, or share on social media.</p>
+          <div>
+            <div>🔗</div>
+            <h3>Shareable</h3>
+            <p>Share timers via link, embed them, or share on social media.</p>
           </div>
 
-          <div className="bg-slate-800/50 backdrop-blur p-6 rounded-xl border border-slate-700">
-            <div className="text-4xl mb-4">🌍</div>
-            <h3 className="text-xl font-semibold mb-2">Social</h3>
-            <p className="text-slate-400">Discover timers from others in our community gallery.</p>
+          <div>
+            <div>🌍</div>
+            <h3>Social</h3>
+            <p>Discover timers from others in our community gallery.</p>
           </div>
         </div>
       </main>
